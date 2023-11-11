@@ -1,0 +1,15 @@
+.hide {
+    display: none;
+}
+
+.show {
+    display: block;
+}
+.align-items-center{align-items: center;}
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+    color: #555;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-bottom-color: transparent;
+    cursor: default;
+}

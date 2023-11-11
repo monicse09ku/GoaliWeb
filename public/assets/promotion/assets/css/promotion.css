@@ -1,0 +1,247 @@
+:root{
+    --light-gray:#f7f7f7;
+    --focus-color: #fff;
+    --green: #599a13;
+    --red: #d61919;
+    --pink: #ff778f;
+}
+body{
+    background-color: var(--light-gray);
+}
+.offer-item {
+    padding: 25px 40px;
+    background: #fff;
+    margin-bottom: 30px;
+    border-radius: 7px;
+    -webkit-box-shadow: 5px 5px 6px -6px #777;
+    -moz-box-shadow: 5px 5px 6px -6px #777;
+         box-shadow: 5px 5px 6px -6px #777;
+}
+.offer-item h3{
+    font-weight: 600;
+    font-family: 'Open Sans', sans-serif;
+}
+.offer-item p{
+    margin-bottom: 0;
+}
+.green-offer{
+    border-left: 4px solid var(--green);
+}
+.red-offer{
+    border-left: 4px solid var(--red);
+}
+.pink-offer{
+    border-left: 4px solid var(--pink);
+}
+.offer-itemlist {
+    display: flex;
+    justify-content: center;
+}
+.offer-option{
+    margin-top: 30px;
+}
+.offer-option-item {
+    width: 200px;
+    background: #fff;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    margin: 0 15px;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+}
+.offer-option-item:hover{
+    box-shadow: 0px 0px 6px 2px rgba(33,33,33,.2);
+}
+.offer-option-item>p {
+    margin-bottom: 0;
+}
+.offer-option-item.selected-offer{
+    border-color: black !important;
+}
+.green-offer-option{
+    background-color: var(--green);
+    border: 1px solid var(--green);
+}
+.red-offer-option{
+    background-color: var(--red);
+    border: 1px solid var(--red);
+}
+.pink-offer-option{
+    background-color: var(--pink);
+    border: 1px solid var(--pink);
+}
+.page-footer {
+    padding: 8px 20px 5px;
+    font-size: 13px;
+    height: 33px;
+    background-color: #ececec;
+}
+b, optgroup, strong {
+    font-weight: 600;
+}
+.prmotion-header{
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    min-height: 50px;        
+    padding: 0 20px;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(45deg, #7030a0, #151b26);
+}
+.logout{
+    font-size: 15px;
+    border-radius: 0;
+    padding: 4px 12px !important;
+}
+
+.promotion-address-field{
+    padding: 30px;
+    margin-bottom: 30px;
+    background-color: #fff;
+}
+.prev_cost, .payable_cost{
+    text-decoration: underline;
+}
+/*Custom select start*/
+.select-container{
+    max-width: 40%;
+    margin: 0px auto;
+    margin-bottom: 30px;
+}
+@media only screen and (max-width: 768px) {
+    .select-container{
+        max-width: 100%;
+    } 
+}
+.custom-select-wrapper {
+    position: relative;
+    user-select: none;
+    width: 100%;
+}
+
+.custom-select {
+    padding: 0;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    border-width: 0 2px 0 2px;
+    border-style: solid;
+    border-color: #442665;
+}
+
+.custom-select__trigger {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 22px;
+    font-size: 20px;
+    font-weight: 300;
+    color: #3b3b3b;
+    height: 60px;
+    line-height: 60px;
+    background: #ffffff;
+    cursor: pointer;
+    border-width: 2px 0 2px 0;
+    border-style: solid;
+    border-color: #442665;
+}
+
+.custom-options {
+    position: absolute;
+    display: block;
+    top: 100%;
+    left: 0;
+    right: 0;
+    border: 2px solid #442665;
+    border-top: 0;
+    background: #fff;
+    transition: all 0.5s;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    z-index: 2;
+    max-height: 370px;
+    overflow: auto;
+}
+
+.custom-select.open .custom-options {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+}
+
+.custom-option {
+    position: relative;
+    display: block;
+    padding: 0 22px 0 22px;
+    font-size: 22px;
+    font-weight: 300;
+    color: #3b3b3b;
+    line-height: 60px;
+    cursor: pointer;
+    transition: all 0.5s;
+}
+
+.custom-option:hover {
+    cursor: pointer;
+    background-color: rgb(68, 38, 101, 11%);
+}
+
+.custom-option.selected {
+    color: #ffffff;
+    background-color: #442665;
+}
+
+.arrow {
+    position: relative;
+    height: 15px;
+    width: 15px;
+}
+
+.arrow::before,
+.arrow::after {
+    content: "";
+    position: absolute;
+    bottom: 0px;
+    width: 0.15rem;
+    height: 100%;
+    transition: all 0.5s;
+}
+
+.arrow::before {
+    left: -5px;
+    transform: rotate(45deg);
+    background-color: #442665;
+}
+
+.arrow::after {
+    left: 5px;
+    transform: rotate(-45deg);
+    background-color: #442665;
+}
+
+.open .arrow::before {
+    left: -5px;
+    transform: rotate(-45deg);
+}
+
+.open .arrow::after {
+    left: 5px;
+    transform: rotate(45deg);
+}
+.renewal-error{
+    padding: 10px; 
+    width: 100%; 
+    color: #fff; 
+    text-align: center;
+    background: #ec0404; 
+}
