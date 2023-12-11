@@ -38,6 +38,11 @@ Route::get('logout', [App\Http\Controllers\AuthenticationController::class, 'log
 //Route::get('error_404', 'ErrorController@error404');
 Route::get('error_404', [App\Http\Controllers\ErrorController::class, 'error404']);
 
+/*
+ * API routes
+ * */
+Route::post('service/login', [App\Http\Controllers\ApiController::class, 'login']);
+
 
 Auth::routes();
 
