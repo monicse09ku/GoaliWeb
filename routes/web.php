@@ -43,6 +43,10 @@ Route::get('error_404', [App\Http\Controllers\ErrorController::class, 'error404'
  * */
 Route::post('service/login', [App\Http\Controllers\ApiController::class, 'login']);
 
+Route::post('service/client/store', [App\Http\Controllers\ApiController::class, 'storeClient']);
+Route::post('service/client/view', [App\Http\Controllers\ApiController::class, 'getClientDetails']);
+Route::post('service/client/update', [App\Http\Controllers\ApiController::class, 'updateClient']);
+
 
 Auth::routes();
 

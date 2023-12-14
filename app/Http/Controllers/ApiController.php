@@ -23,8 +23,8 @@ class ApiController extends Controller
         if ($request->oAuth_token != Common::OAUTH_TOKEN) {
             return ['status'=>401, 'reason'=>'Invalid oAuth token'];
         }
-        if ($request->email == '') {
-            return ['status'=>401, 'reason'=>'Email is required'];
+        if ($request->username == '') {
+            return ['status'=>401, 'reason'=>'Username is required'];
         }
         if ($request->password == '') {
             return ['status'=>401, 'reason'=>'Password is required'];
@@ -55,44 +55,32 @@ class ApiController extends Controller
     }
 
     /*
-     * Storing chw data
+     * Saving new client data
      * */
-    public function storeChw(Request $request)
+    public function storeClient(Request $request)
     {
         if ($request->oAuth_token != Common::OAUTH_TOKEN) {
             return ['status'=>401, 'reason'=>'Invalid oAuth token'];
         }
-        if ($request->cc_id == '') {
-            return ['status'=>401, 'reason'=>'CC id is required'];
+        if ($request->first_name == '') {
+            return ['status'=>401, 'reason'=>'First name is required'];
         }
-        if ($request->name == '') {
-            return ['status'=>401, 'reason'=>'Name is required'];
-        }
-        /*if ($request->email == '') {
-            return ['status'=>401, 'reason'=>'Email is required'];
+        if ($request->username == '') {
+            return ['status'=>401, 'reason'=>'Username is required'];
         }
         if ($request->password == '') {
             return ['status'=>401, 'reason'=>'Password is required'];
-        }*/
+        }
 
-        $name_data = explode(' ',$request->name);
-        $email = $name_data[0].Common::generaterandomNumber(1).'@gmail.com';
-        $password = Common::generaterandomNumber(6);
 
         try {
-            $chw = NEW User();
-            $chw->parent_id = $request->cc_id;
-            $chw->name = $request->name;
-            $chw->email = $email;
-            //$chw->password = bcrypt($password); // Password will be added from approval function
-            $chw->phone = $request->phone;
-            $chw->address = $request->address;
-            $chw->status = 'pending';
-            $chw->role = 4;
-            // $chw->created_at = date('Y-m-d h:i:s');
-            $chw->save();
-
-            return ['status' => 200,'reason'=>'You have successfully registered'];
+            $result = Service::storeClient($request);
+            if($result['status']==200){
+                return ['status' => 200,'reason' => 'Successfully saved','id'=>$result['id']];
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
         }
         catch (\Exception $e) {
             DB::rollback();
@@ -101,24 +89,49 @@ class ApiController extends Controller
     }
 
     /*
-     * Getting chw data
+     * Getting client detail data
      * */
-    public function getChws(Request $request)
+    public function getClientDetails(Request $request)
     {
         if ($request->oAuth_token != Common::OAUTH_TOKEN) {
             return ['status'=>401, 'reason'=>'Invalid oAuth token'];
         }
-
+        if ($request->client_id == '') {
+            return ['status'=>401, 'reason'=>'Client id is required'];
+        }
         try {
-            if($request->cc_id !=''){
-                $cc_ids = Service::getCcUserParent($request->cc_id); // Here $request->cc_id is the user id
-            }
-            else{
-                $cc_ids = '';
-            }
-            $result = Service::getChws($cc_ids);
+            $result = Service::getClientDetails($request->client_id);
             if($result['status']==200){
                 return ['status' => 200,'data'=>$result['data']];
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
+     * Saving new client data
+     * */
+    public function updateClient(Request $request)
+    {
+        if ($request->oAuth_token != Common::OAUTH_TOKEN) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->client_id == '') {
+            return ['status'=>401, 'reason'=>'Client id is required'];
+        }
+        if ($request->first_name == '') {
+            return ['status'=>401, 'reason'=>'First name is required'];
+        }
+        try {
+            $result = Service::updateClient($request);
+            if($result['status']==200){
+                return ['status' => 200,'reason' => 'Successfully updated','id'=>$result['id']];
             }
             else{
                 return ['status' => 401,'reason' => $result['reason']];

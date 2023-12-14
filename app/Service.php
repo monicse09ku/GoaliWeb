@@ -1,6 +1,7 @@
 <?php
 
 namespace App;
+use App\Models\Client;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Mail;
@@ -81,6 +82,107 @@ class Service
             ->orderBy('notifications.id','DESC')
             ->get();
         return $notifications;
+    }
+
+    /*
+     * Saving household data
+     * */
+    public static function storeClient($request){
+        try{
+            DB::beginTransaction();
+
+            $old_client = User::where('username',$request->username)->where('status','!=','deleted')->first();
+            if(!empty($old_client)){
+                return ['status'=>401, 'reason'=>'This client username already exists'];
+            }
+
+            $client = NEW Client();
+            $client->first_name = $request->first_name;
+            $client->last_name = $request->last_name;
+            $client->email = $request->email;
+            $client->about_me = $request->about_me;
+            if($request->hobbies != ''){
+                $client->hobbies = implode(',',$request->hobbies);
+            }
+            if($request->language){
+                $client->languages = implode(',',$request->language);
+            }
+            if($request->core_skills){
+                $client->core_skills = implode(',',$request->core_skills);
+            }
+            $client->created_at = date('Y-m-d h:i:s');
+            $client->save();
+
+            /*
+             * Adding user information
+             * */
+            $user = new User();
+            $user->name = $request->first_name." ".$request->last_name;
+            $user->email = $request->email;
+            $user->username = $request->username;
+            $user->password = bcrypt($request->password);
+            $user->phone = $request->phone;
+            $user->role = 3;
+            $user->status = 'active';
+            $user->save();
+
+            /*
+             * Update client user id
+             * */
+            $client_update = Client::where('id',$client->id)->first();
+            $client_update->user_id = $user->id;
+            $client_update->save();
+
+            Db::commit();
+
+            return ['status'=>200, 'id'=>$client->id];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
+     * Getting client details
+     * */
+    public static function getClientDetails($client_id){
+        try{
+            $client = Client::select('clients.*')->where('clients.id',$client_id)->first();
+
+            return ['status'=>200, 'data'=>$client];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
+     * Saving client data
+     * */
+    public static function updateClient($request){
+        try{
+            $client = Client::where('id',$request->client_id)->first();
+            $client->first_name = $request->first_name;
+            $client->last_name = $request->last_name;
+            $client->email = $request->email;
+            $client->about_me = $request->about_me;
+            if($request->hobbies != ''){
+                $client->hobbies = implode(',',$request->hobbies);
+            }
+            if($request->language){
+                $client->languages = implode(',',$request->language);
+            }
+            if($request->core_skills){
+                $client->core_skills = implode(',',$request->core_skills);
+            }
+            $client->updated_at = date('Y-m-d h:i:s');
+            $client->save();
+
+            return ['status'=>200, 'id'=>$client->id];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
     }
 
 

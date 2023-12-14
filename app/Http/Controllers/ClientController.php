@@ -122,13 +122,8 @@ class ClientController extends Controller
 
     public function update(Request $request)
     {
-        //try{
+        try{
             $user = Auth::user();
-
-            $old_client = User::where('username',$request->username)->where('status','!=','deleted')->first();
-            if(!empty($old_client) && $old_client->id != $request->user_id){
-                return ['status'=>401, 'reason'=>'This client username already exists'];
-            }
 
             $client = Client::where('id',$request->id)->first();
             $client->first_name = $request->first_name;
@@ -142,10 +137,10 @@ class ClientController extends Controller
             $client->save();
 
             return ['status'=>200, 'reason'=>'Successfully saved'];
-        /*}
+        }
         catch(\Exception $e){
             return ['status'=>401, 'reason'=>'Something went wrong. Try again later.'];
-        }*/
+        }
     }
 
     public function delete(Request $request)

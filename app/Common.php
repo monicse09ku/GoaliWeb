@@ -30,7 +30,7 @@ class Common
      * Site information section ended
      * */
 
-    const OAUTH_TOKEN = 'cw123456';
+    const OAUTH_TOKEN = 'g123456';
 
     const VALID_IMAGE_EXTENSIONS = ['jpg','JPG','jpeg','JPEG','png','PNG'];
     const VALID_FILE_EXTENSIONS = ['jpg','JPG','jpeg','JPEG','png','PNG','svg','doc','docx','odt','xls','xlsx','ods','pdf','mp3','mp4','wav','zip','tar','gzip'];
