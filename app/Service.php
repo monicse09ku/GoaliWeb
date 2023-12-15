@@ -100,16 +100,20 @@ class Service
             $client->first_name = $request->first_name;
             $client->last_name = $request->last_name;
             $client->email = $request->email;
-            $client->about_me = $request->about_me;
-            if($request->hobbies != ''){
+
+            if(isset($request->about_me)) {
+                $client->about_me = $request->about_me;
+            }
+            if(isset($request->hobbies) && $request->hobbies != ''){
                 $client->hobbies = implode(',',$request->hobbies);
             }
-            if($request->language){
+            if(isset($request->language) && $request->language != ''){
                 $client->languages = implode(',',$request->language);
             }
-            if($request->core_skills){
+            if(isset($request->core_skills) && $request->core_skills != ''){
                 $client->core_skills = implode(',',$request->core_skills);
             }
+
             $client->created_at = date('Y-m-d h:i:s');
             $client->save();
 
@@ -162,17 +166,25 @@ class Service
     public static function updateClient($request){
         try{
             $client = Client::where('id',$request->client_id)->first();
-            $client->first_name = $request->first_name;
-            $client->last_name = $request->last_name;
-            $client->email = $request->email;
-            $client->about_me = $request->about_me;
-            if($request->hobbies != ''){
+            if(isset($request->first_name)){
+                $client->first_name = $request->first_name;
+            }
+            if(isset($request->last_name)) {
+                $client->last_name = $request->last_name;
+            }
+            if(isset($request->email)) {
+                $client->email = $request->email;
+            }
+            if(isset($request->about_me)) {
+                $client->about_me = $request->about_me;
+            }
+            if(isset($request->hobbies) && $request->hobbies != ''){
                 $client->hobbies = implode(',',$request->hobbies);
             }
-            if($request->language){
+            if(isset($request->language) && $request->language != ''){
                 $client->languages = implode(',',$request->language);
             }
-            if($request->core_skills){
+            if(isset($request->core_skills) && $request->core_skills != ''){
                 $client->core_skills = implode(',',$request->core_skills);
             }
             $client->updated_at = date('Y-m-d h:i:s');

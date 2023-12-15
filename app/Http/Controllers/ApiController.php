@@ -65,6 +65,9 @@ class ApiController extends Controller
         if ($request->first_name == '') {
             return ['status'=>401, 'reason'=>'First name is required'];
         }
+        if ($request->email == '') {
+            return ['status'=>401, 'reason'=>'Email is required'];
+        }
         if ($request->username == '') {
             return ['status'=>401, 'reason'=>'Username is required'];
         }
@@ -125,9 +128,9 @@ class ApiController extends Controller
         if ($request->client_id == '') {
             return ['status'=>401, 'reason'=>'Client id is required'];
         }
-        if ($request->first_name == '') {
+        /*if ($request->first_name == '') {
             return ['status'=>401, 'reason'=>'First name is required'];
-        }
+        }*/
         try {
             $result = Service::updateClient($request);
             if($result['status']==200){
