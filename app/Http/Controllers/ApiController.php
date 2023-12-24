@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Client;
 use App\Models\User;
 use App\Service;
 use App\Common;
@@ -47,6 +48,78 @@ class ApiController extends Controller
             } else {
                 return ['status' => 401, 'reason' => 'Invalid credentials'];
             }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
+     * Reset password request
+     * */
+    public function resetPasswordRequest(Request $request)
+    {
+        if ($request->oAuth_token != Common::OAUTH_TOKEN) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->client_id == '') {
+            return ['status'=>401, 'reason'=>'Client id is required'];
+        }
+        /*if ($request->password == '') {
+            return ['status'=>401, 'reason'=>'Password is required'];
+        }*/
+
+        try {
+            $client = Client::where('id', $request->client_id)->first();
+            /*
+             * Confirmation code sending (sms) start
+             * */
+             $code = 123456;
+            $emailData['email'] = $client->email;
+            $emailData['subject'] = Common::SITE_TITLE." - Password reset code";
+            $emailData['code'] = $code;
+            $view = 'emails.password_reset_code';
+            $result = SendMails::sendMail($emailData, $view);
+            /*
+             * Confirmation code sending (sms) ends
+             * */
+            if($result){
+                return ['status' => 200, 'reason' => 'We have sent you an email with a code, to re-set your password','client_id'=>$request->client_id, 'code'=>$code];
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
+     * Reset password request
+     * */
+    public function resetPasswordConfirmation(Request $request)
+    {
+        if ($request->oAuth_token != Common::OAUTH_TOKEN) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->client_id == '') {
+            return ['status'=>401, 'reason'=>'Client id is required'];
+        }
+        if ($request->password == '') {
+            return ['status'=>401, 'reason'=>'Password is required'];
+        }
+
+        try {
+            $client = Client::where('id', $request->client_id)->first();
+            $user = User::find($client->user_id);
+            $user->password = bcrypt($request->password);
+            $user->updated_at = date('Y-m-d h:i:s');
+            $user->save();
+
+            return ['status' => 200, 'reason' => 'Password updated successfully','client_id'=>$request->client_id];
         }
         catch (\Exception $e) {
             DB::rollback();
@@ -135,6 +208,174 @@ class ApiController extends Controller
             $result = Service::updateClient($request);
             if($result['status']==200){
                 return ['status' => 200,'reason' => 'Successfully updated','id'=>$result['id']];
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
+     * Getting all genre data
+     * */
+    public function allGenre(Request $request)
+    {
+        if ($request->oAuth_token != Common::OAUTH_TOKEN) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+
+        try {
+            $result = Service::getAllGenre();
+            if($result['status']==200){
+                return ['status' => 200,'data' => $result['data']];
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
+     * Getting all goal data
+     * */
+    public function allGoal(Request $request)
+    {
+        if ($request->oAuth_token != Common::OAUTH_TOKEN) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->client_id == '') {
+            return ['status'=>401, 'reason'=>'Client id is required'];
+        }
+
+        try {
+            $result = Service::getAllGoal($request->client_id);
+            if($result['status']==200){
+                return ['status' => 200,'data' => $result['data']];
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
+     * Saving new goal data
+     * */
+    public function storeGoal(Request $request)
+    {
+        if ($request->oAuth_token != Common::OAUTH_TOKEN) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->client_id == '') {
+            return ['status'=>401, 'reason'=>'Client id is required'];
+        }
+        if ($request->goal_type == '') {
+            return ['status'=>401, 'reason'=>'Goal type is required'];
+        }
+        if ($request->goal_name == '') {
+            return ['status'=>401, 'reason'=>'Goal name is required'];
+        }
+
+        try {
+            $result = Service::storeGoal($request);
+            if($result['status']==200){
+                return ['status' => 200,'reason' => 'Successfully saved','id'=>$result['id']];
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
+     * Getting goal detail data
+     * */
+    public function getGoalDetails(Request $request)
+    {
+        if ($request->oAuth_token != Common::OAUTH_TOKEN) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->goal_id == '') {
+            return ['status'=>401, 'reason'=>'goal id is required'];
+        }
+        try {
+            $result = Service::getGoalDetails($request->goal_id);
+            if($result['status']==200){
+                return ['status' => 200,'data'=>$result['data']];
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
+     * Updating goal data
+     * */
+    public function updateGoal(Request $request)
+    {
+        if ($request->oAuth_token != Common::OAUTH_TOKEN) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->goal_id == '') {
+            return ['status'=>401, 'reason'=>'goal id is required'];
+        }
+        if ($request->goal_type == '') {
+            return ['status'=>401, 'reason'=>'Goal type is required'];
+        }
+        if ($request->goal_name == '') {
+            return ['status'=>401, 'reason'=>'Goal name is required'];
+        }
+        try {
+            $result = Service::updateGoal($request);
+            if($result['status']==200){
+                return ['status' => 200,'reason' => 'Successfully updated','id'=>$result['id']];
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
+     * Deleting goal data
+     * */
+    public function deleteGoal(Request $request)
+    {
+        if ($request->oAuth_token != Common::OAUTH_TOKEN) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->goal_id == '') {
+            return ['status'=>401, 'reason'=>'goal id is required'];
+        }
+        try {
+            $result = Service::deleteGoal($request);
+            if($result['status']==200){
+                return ['status' => 200,'reason' => 'Successfully deleted'];
             }
             else{
                 return ['status' => 401,'reason' => $result['reason']];

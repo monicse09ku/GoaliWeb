@@ -42,10 +42,20 @@ Route::get('error_404', [App\Http\Controllers\ErrorController::class, 'error404'
  * API routes
  * */
 Route::post('service/login', [App\Http\Controllers\ApiController::class, 'login']);
+Route::post('service/reset_password_request', [App\Http\Controllers\ApiController::class, 'resetPasswordRequest']);
+Route::post('service/reset_password_confirmation', [App\Http\Controllers\ApiController::class, 'resetPasswordConfirmation']);
 
 Route::post('service/client/store', [App\Http\Controllers\ApiController::class, 'storeClient']);
 Route::post('service/client/view', [App\Http\Controllers\ApiController::class, 'getClientDetails']);
 Route::post('service/client/update', [App\Http\Controllers\ApiController::class, 'updateClient']);
+
+Route::post('service/genre/all', [App\Http\Controllers\ApiController::class, 'allGenre']);
+
+Route::post('service/goal/all', [App\Http\Controllers\ApiController::class, 'allGoal']);
+Route::post('service/goal/store', [App\Http\Controllers\ApiController::class, 'storeGoal']);
+Route::post('service/goal/view', [App\Http\Controllers\ApiController::class, 'getGoalDetails']);
+Route::post('service/goal/update', [App\Http\Controllers\ApiController::class, 'updateGoal']);
+Route::post('service/goal/delete', [App\Http\Controllers\ApiController::class, 'deleteGoal']);
 
 
 Auth::routes();

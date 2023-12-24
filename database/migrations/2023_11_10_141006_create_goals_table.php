@@ -22,8 +22,8 @@ class CreateGoalsTable extends Migration
             $table->integer('priority')->nullable();
             $table->decimal('completion_percentage',10,2)->nullable();
             $table->enum('status', ['active','inactive','deleted'])->default('active');
-            $table->timestamp('deleted_at');
             $table->timestamps();
+            $table->timestamp('deleted_at')->nullable();
         });
     }
 

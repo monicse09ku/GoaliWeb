@@ -2,6 +2,8 @@
 
 namespace App;
 use App\Models\Client;
+use App\Models\Genre;
+use App\Models\Goal;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Mail;
@@ -85,7 +87,7 @@ class Service
     }
 
     /*
-     * Saving household data
+     * Saving client data
      * */
     public static function storeClient($request){
         try{
@@ -191,6 +193,124 @@ class Service
             $client->save();
 
             return ['status'=>200, 'id'=>$client->id];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+    /*
+     * Getting all genre
+     * */
+    public static function getAllGenre(){
+        try{
+            $genres = Genre::select('genres.*')
+                ->where('genres.status','active')
+                ->get();
+
+            return ['status'=>200, 'data'=>$genres];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
+     * Getting all goal of a client
+     * */
+    public static function getAllGoal($client_id=''){
+        try{
+            $goals = Goal::select('goals.*');
+            if($client_id != ''){
+                $goals = $goals->where('goals.client_id',$client_id);
+            }
+            $goals = $goals->where('goals.status','active');
+            $goals = $goals->get();
+
+            return ['status'=>200, 'data'=>$goals];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
+     * Saving goal data
+     * */
+    public static function storeGoal($request){
+        try{
+            $goal = NEW Goal();
+            $goal->client_id = $request->client_id;
+            $goal->goal_type = $request->goal_type;
+            $goal->goal_name = $request->goal_name;
+            $goal->genre_id = $request->genre_id;
+            $goal->priority = $request->priority;
+            $goal->completion_percentage = 0;
+            $goal->created_at = date('Y-m-d h:i:s');
+            $goal->save();
+
+            return ['status'=>200, 'id'=>$goal->id];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
+     * Getting goal details
+     * */
+    public static function getGoalDetails($goal_id){
+        try{
+            $goal = Goal::select('goals.*')->where('goals.id',$goal_id)->first();
+
+            return ['status'=>200, 'data'=>$goal];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
+     * Updating goal data
+     * */
+    public static function updateGoal($request)
+    {
+        try {
+            $goal = Goal::where('id', $request->goal_id)->first();
+            if (isset($request->client_id)) {
+                $goal->client_id = $request->client_id;
+            }
+            if (isset($request->goal_type)) {
+                $goal->goal_type = $request->goal_type;
+            }
+            if (isset($request->goal_name)) {
+                $goal->goal_name = $request->goal_name;
+            }
+            if (isset($request->genre_id)) {
+                $goal->genre_id = $request->genre_id;
+            }
+            if (isset($request->priority)) {
+                $goal->priority = $request->priority;
+            }
+            $goal->updated_at = date('Y-m-d h:i:s');
+            $goal->save();
+
+            return ['status' => 200, 'id' => $goal->id];
+        } catch (\Exception $e) {
+            return ['status' => 401, 'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
+     * Deleting goal data
+     * */
+    public static function deleteGoal($request){
+        try{
+            $goal = Goal::where('id',$request->goal_id)->first();
+            $goal->status = 'deleted';
+            $goal->deleted_at = date('Y-m-d h:i:s');
+            $goal->save();
+
+            return ['status'=>200, 'id'=>$goal->id];
         }
         catch(\Exception $e){
             return ['status'=>401, 'reason'=>$e->getMessage()];
