@@ -4,6 +4,7 @@ namespace App;
 use App\Models\Client;
 use App\Models\Genre;
 use App\Models\Goal;
+use App\Models\GoalStep;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Mail;
@@ -311,6 +312,105 @@ class Service
             $goal->save();
 
             return ['status'=>200, 'id'=>$goal->id];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+
+    /*
+     * Saving goal step data
+     * */
+    public static function storeGoalStep($request){
+        try{
+            $goal_step = NEW GoalStep();
+            $goal_step->goal_id = $request->goal_id;
+            $goal_step->step_name = $request->step_name;
+            $goal_step->description = $request->description;
+            if($request->end_date != ''){
+                $goal_step->end_date = date('Y-m-d', strtotime($request->end_date));
+            }
+            $goal_step->note = $request->note;
+            if($request->reminder_time != ''){
+                $goal_step->reminder_time = date('Y-m-d h:i:s', strtotime($request->reminder_time));
+            }
+            $goal_step->step_occurrence = $request->step_occurrence;
+            if($request->step_occurrence_weekdays != ''){
+                $goal_step->step_occurrence_weekdays = $request->step_occurrence_weekdays;
+            }
+            $goal_step->created_at = date('Y-m-d h:i:s');
+            $goal_step->save();
+
+            return ['status'=>200, 'id'=>$goal_step->id];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
+     * Getting goal step details
+     * */
+    public static function getGoalStepDetails($step_id){
+        try{
+            $goal_step = GoalStep::select('goal_steps.*')->where('goal_steps.id',$step_id)->first();
+
+            return ['status'=>200, 'data'=>$goal_step];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
+     * Updating goal step data
+     * */
+    public static function updateGoalStep($request)
+    {
+        try {
+            $goal_step = GoalStep::where('id', $request->step_id)->first();
+            if (isset($request->step_name)) {
+                $goal_step->step_name = $request->step_name;
+            }
+            if (isset($request->description)) {
+                $goal_step->description = $request->description;
+            }
+            if($request->end_date != ''){
+                $goal_step->end_date = date('Y-m-d', strtotime($request->end_date));
+            }
+            if (isset($request->note)) {
+                $goal_step->note = $request->note;
+            }
+            if($request->reminder_time != ''){
+                $goal_step->reminder_time = date('Y-m-d h:i:s', strtotime($request->reminder_time));
+            }
+            if (isset($request->step_occurrence)) {
+                $goal_step->step_occurrence = $request->step_occurrence;
+            }
+            if (isset($request->step_occurrence_weekdays)) {
+                $goal_step->step_occurrence_weekdays = $request->step_occurrence_weekdays;
+            }
+            $goal_step->updated_at = date('Y-m-d h:i:s');
+            $goal_step->save();
+
+            return ['status' => 200, 'id' => $goal_step->id];
+        } catch (\Exception $e) {
+            return ['status' => 401, 'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
+     * Deleting goal step data
+     * */
+    public static function deleteGoalStep($request){
+        try{
+            $goal_step = GoalStep::where('id',$request->step_id)->first();
+            $goal_step->status = 'deleted';
+            $goal_step->deleted_at = date('Y-m-d h:i:s');
+            $goal_step->save();
+
+            return ['status'=>200, 'id'=>$goal_step->id];
         }
         catch(\Exception $e){
             return ['status'=>401, 'reason'=>$e->getMessage()];

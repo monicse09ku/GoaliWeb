@@ -57,6 +57,11 @@ Route::post('service/goal/view', [App\Http\Controllers\ApiController::class, 'ge
 Route::post('service/goal/update', [App\Http\Controllers\ApiController::class, 'updateGoal']);
 Route::post('service/goal/delete', [App\Http\Controllers\ApiController::class, 'deleteGoal']);
 
+Route::post('service/goal_step/store', [App\Http\Controllers\ApiController::class, 'storeGoalStep']);
+Route::post('service/goal_step/view', [App\Http\Controllers\ApiController::class, 'getGoalStepDetails']);
+Route::post('service/goal_step/update', [App\Http\Controllers\ApiController::class, 'updateGoalStep']);
+Route::post('service/goal_step/delete', [App\Http\Controllers\ApiController::class, 'deleteGoalStep']);
+
 
 Auth::routes();
 

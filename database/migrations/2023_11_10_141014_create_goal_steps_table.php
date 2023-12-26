@@ -26,6 +26,7 @@ class CreateGoalStepsTable extends Migration
             $table->text('attachments')->nullable();
             $table->enum('status', ['active','inactive','deleted'])->default('active');
             $table->timestamps();
+            $table->timestamp('deleted_at')->nullable();
         });
     }
 

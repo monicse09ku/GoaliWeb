@@ -386,4 +386,119 @@ class ApiController extends Controller
             return ['status' => 401,'reason' => $e->getMessage()];
         }
     }
+
+
+    /*
+     * Saving new goal step data
+     * */
+    public function storeGoalStep(Request $request)
+    {
+        if ($request->oAuth_token != Common::OAUTH_TOKEN) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->goal_id == '') {
+            return ['status'=>401, 'reason'=>'Goal id is required'];
+        }
+        if ($request->step_name == '') {
+            return ['status'=>401, 'reason'=>'Step name is required'];
+        }
+        if ($request->end_date == '') {
+            return ['status'=>401, 'reason'=>'End date is required'];
+        }
+
+        try {
+            $result = Service::storeGoalStep($request);
+            if($result['status']==200){
+                return ['status' => 200,'reason' => 'Successfully saved','id'=>$result['id']];
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
+     * Getting goal step detail data
+     * */
+    public function getGoalStepDetails(Request $request)
+    {
+        if ($request->oAuth_token != Common::OAUTH_TOKEN) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->step_id == '') {
+            return ['status'=>401, 'reason'=>'Step id is required'];
+        }
+        try {
+            $result = Service::getGoalStepDetails($request->step_id);
+            if($result['status']==200){
+                return ['status' => 200,'data'=>$result['data']];
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
+     * Updating goal step data
+     * */
+    public function updateGoalStep(Request $request)
+    {
+        if ($request->oAuth_token != Common::OAUTH_TOKEN) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->step_id == '') {
+            return ['status'=>401, 'reason'=>'Step id is required'];
+        }
+        if ($request->step_name == '') {
+            return ['status'=>401, 'reason'=>'Step name is required'];
+        }
+        try {
+            $result = Service::updateGoalStep($request);
+            if($result['status']==200){
+                return ['status' => 200,'reason' => 'Successfully updated','id'=>$result['id']];
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
+     * Deleting goal step data
+     * */
+    public function deleteGoalStep(Request $request)
+    {
+        if ($request->oAuth_token != Common::OAUTH_TOKEN) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->step_id == '') {
+            return ['status'=>401, 'reason'=>'Step id is required'];
+        }
+        try {
+            $result = Service::deleteGoalStep($request);
+            if($result['status']==200){
+                return ['status' => 200,'reason' => 'Successfully deleted'];
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
 }
