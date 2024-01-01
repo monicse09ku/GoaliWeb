@@ -21,9 +21,6 @@ class ApiController extends Controller
 
     public function login(Request $request)
     {
-        if ($request->oAuth_token != Common::OAUTH_TOKEN) {
-            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
-        }
         if ($request->username == '') {
             return ['status'=>401, 'reason'=>'Username is required'];
         }
@@ -40,7 +37,7 @@ class ApiController extends Controller
 
             if ($result) {
                 $loggedUser = Auth::user();
-                $user = User::select('users.*')
+                $user = User::select('id','name','email','phone','photo','role','oauth_token')
                     ->where('users.id',$loggedUser->id)
                     ->first();
 
@@ -128,13 +125,13 @@ class ApiController extends Controller
     }
 
     /*
-     * Saving new client data
+     * Saving new client data from signup
      * */
     public function storeClient(Request $request)
     {
-        if ($request->oAuth_token != Common::OAUTH_TOKEN) {
+        /*if ($request->oAuth_token != Common::OAUTH_TOKEN) {
             return ['status'=>401, 'reason'=>'Invalid oAuth token'];
-        }
+        }*/
         if ($request->first_name == '') {
             return ['status'=>401, 'reason'=>'First name is required'];
         }
@@ -169,7 +166,10 @@ class ApiController extends Controller
      * */
     public function getClientDetails(Request $request)
     {
-        if ($request->oAuth_token != Common::OAUTH_TOKEN) {
+        /*if ($request->oAuth_token != Common::OAUTH_TOKEN) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }*/
+        if (!Service::hasAccess($request->oAuth_token)) {
             return ['status'=>401, 'reason'=>'Invalid oAuth token'];
         }
         if ($request->client_id == '') {
@@ -195,7 +195,7 @@ class ApiController extends Controller
      * */
     public function updateClient(Request $request)
     {
-        if ($request->oAuth_token != Common::OAUTH_TOKEN) {
+        if (!Service::hasAccess($request->oAuth_token)) {
             return ['status'=>401, 'reason'=>'Invalid oAuth token'];
         }
         if ($request->client_id == '') {
@@ -224,7 +224,7 @@ class ApiController extends Controller
      * */
     public function allGenre(Request $request)
     {
-        if ($request->oAuth_token != Common::OAUTH_TOKEN) {
+        if (!Service::hasAccess($request->oAuth_token)) {
             return ['status'=>401, 'reason'=>'Invalid oAuth token'];
         }
 
@@ -248,7 +248,7 @@ class ApiController extends Controller
      * */
     public function allGoal(Request $request)
     {
-        if ($request->oAuth_token != Common::OAUTH_TOKEN) {
+        if (!Service::hasAccess($request->oAuth_token)) {
             return ['status'=>401, 'reason'=>'Invalid oAuth token'];
         }
         if ($request->client_id == '') {
@@ -275,7 +275,7 @@ class ApiController extends Controller
      * */
     public function storeGoal(Request $request)
     {
-        if ($request->oAuth_token != Common::OAUTH_TOKEN) {
+        if (!Service::hasAccess($request->oAuth_token)) {
             return ['status'=>401, 'reason'=>'Invalid oAuth token'];
         }
         if ($request->client_id == '') {
@@ -308,7 +308,7 @@ class ApiController extends Controller
      * */
     public function getGoalDetails(Request $request)
     {
-        if ($request->oAuth_token != Common::OAUTH_TOKEN) {
+        if (!Service::hasAccess($request->oAuth_token)) {
             return ['status'=>401, 'reason'=>'Invalid oAuth token'];
         }
         if ($request->goal_id == '') {
@@ -334,7 +334,7 @@ class ApiController extends Controller
      * */
     public function updateGoal(Request $request)
     {
-        if ($request->oAuth_token != Common::OAUTH_TOKEN) {
+        if (!Service::hasAccess($request->oAuth_token)) {
             return ['status'=>401, 'reason'=>'Invalid oAuth token'];
         }
         if ($request->goal_id == '') {
@@ -366,7 +366,7 @@ class ApiController extends Controller
      * */
     public function deleteGoal(Request $request)
     {
-        if ($request->oAuth_token != Common::OAUTH_TOKEN) {
+        if (!Service::hasAccess($request->oAuth_token)) {
             return ['status'=>401, 'reason'=>'Invalid oAuth token'];
         }
         if ($request->goal_id == '') {
@@ -393,7 +393,7 @@ class ApiController extends Controller
      * */
     public function storeGoalStep(Request $request)
     {
-        if ($request->oAuth_token != Common::OAUTH_TOKEN) {
+        if (!Service::hasAccess($request->oAuth_token)) {
             return ['status'=>401, 'reason'=>'Invalid oAuth token'];
         }
         if ($request->goal_id == '') {
@@ -426,7 +426,7 @@ class ApiController extends Controller
      * */
     public function getGoalStepDetails(Request $request)
     {
-        if ($request->oAuth_token != Common::OAUTH_TOKEN) {
+        if (!Service::hasAccess($request->oAuth_token)) {
             return ['status'=>401, 'reason'=>'Invalid oAuth token'];
         }
         if ($request->step_id == '') {
@@ -452,7 +452,7 @@ class ApiController extends Controller
      * */
     public function updateGoalStep(Request $request)
     {
-        if ($request->oAuth_token != Common::OAUTH_TOKEN) {
+        if (!Service::hasAccess($request->oAuth_token)) {
             return ['status'=>401, 'reason'=>'Invalid oAuth token'];
         }
         if ($request->step_id == '') {
@@ -481,7 +481,7 @@ class ApiController extends Controller
      * */
     public function deleteGoalStep(Request $request)
     {
-        if ($request->oAuth_token != Common::OAUTH_TOKEN) {
+        if (!Service::hasAccess($request->oAuth_token)) {
             return ['status'=>401, 'reason'=>'Invalid oAuth token'];
         }
         if ($request->step_id == '') {

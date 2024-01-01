@@ -36,6 +36,16 @@ class Service
         return 0;
     }
 
+    public static function hasAccess($token){
+        $user = User::where('oauth_token',$token)->first();
+        if(!empty($user)){
+            return 1;
+        }
+        else{
+            return 0;
+        }
+    }
+
     /*
      * Get notifications
      * */
@@ -99,6 +109,8 @@ class Service
                 return ['status'=>401, 'reason'=>'This client username already exists'];
             }
 
+            $token = Common::generaterandomString(8);
+
             $client = NEW Client();
             $client->first_name = $request->first_name;
             $client->last_name = $request->last_name;
@@ -130,6 +142,7 @@ class Service
             $user->password = bcrypt($request->password);
             $user->phone = $request->phone;
             $user->role = 3;
+            $user->oauth_token = $token;
             $user->status = 'active';
             $user->save();
 

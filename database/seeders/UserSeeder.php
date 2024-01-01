@@ -32,5 +32,14 @@ class UserSeeder extends Seeder
             'role'  => 2,
             'created_at'  => date('Y-m-d h:i:s')
         ]);
+
+        User::create([
+            'name' => 'Client',
+            'email' => 'client@gmail.com',
+            'username' => 'client',
+            'password' => Hash::make('123456'),
+            'role'  => 3,
+            'created_at'  => date('Y-m-d h:i:s')
+        ]);
     }
 }

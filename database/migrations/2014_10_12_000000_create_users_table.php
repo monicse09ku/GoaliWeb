@@ -24,7 +24,7 @@ class CreateUsersTable extends Migration
             $table->string('photo',128)->nullable();
             $table->enum('status', ['active','inactive','deleted'])->default('active');
             $table->tinyInteger('role')->default('3')->comment('1=Super Admin; 2=Admin; 3=Client;');
-            $table->enum('language', ['arabic','english'])->default('arabic');
+            $table->string('oauth_token')->nullable();
             $table->timestamp('deleted_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
