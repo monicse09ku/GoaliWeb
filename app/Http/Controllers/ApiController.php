@@ -149,7 +149,7 @@ class ApiController extends Controller
         try {
             $result = Service::storeClient($request);
             if($result['status']==200){
-                return ['status' => 200,'reason' => 'Successfully saved','id'=>$result['id']];
+                return ['status' => 200,'reason' => 'Successfully saved','id'=>$result['id'],'token'=>$result['token']];
             }
             else{
                 return ['status' => 401,'reason' => $result['reason']];

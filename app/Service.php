@@ -155,7 +155,7 @@ class Service
 
             Db::commit();
 
-            return ['status'=>200, 'id'=>$client->id];
+            return ['status'=>200, 'id'=>$client->id, 'token'=>$token];
         }
         catch(\Exception $e){
             return ['status'=>401, 'reason'=>$e->getMessage()];
