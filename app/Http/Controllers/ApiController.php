@@ -511,19 +511,29 @@ class ApiController extends Controller
             return ['status'=>401, 'reason'=>'Invalid oAuth token'];
         }
         if ($request->search_category == '') {
-            return ['status'=>401, 'reason'=>'Search category is is required'];
+            return ['status'=>401, 'reason'=>'Search category is required'];
         }
         if ($request->text == '') {
             return ['status'=>401, 'reason'=>'Text is is required'];
         }
+        if ($request->search_category == 'goal' && $request->client_id=='') {
+            return ['status'=>401, 'reason'=>'Client id is required'];
+        }
+
         try {
             $result = Service::search($request);
             if($result['status']==200){
                 if($request->search_category=='goal') {
                     return ['status' => 200, 'goals' => $result['goals'], 'goal_steps' => $result['goal_steps']];
                 }
-                else{ // If search category is people
+                else if($request->search_category=='people') { // If search category is people
                     return ['status' => 200, 'clients' => $result['clients']];
+                }
+                else if($request->search_category=='skill') { // If search category is skill
+                    return ['status' => 200, 'clients' => $result['clients']];
+                }
+                else{
+                    //
                 }
             }
             else{

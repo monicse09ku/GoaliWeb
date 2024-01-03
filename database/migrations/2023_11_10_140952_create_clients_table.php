@@ -24,6 +24,7 @@ class CreateClientsTable extends Migration
             $table->tinyInteger('sync_with_calendar')->nullable();
             $table->string('languages')->nullable();
             $table->string('core_skills')->nullable();
+            $table->string('photo')->nullable();
             $table->enum('status', ['active','inactive','deleted'])->default('active');
             $table->timestamps();
         });

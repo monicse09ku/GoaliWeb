@@ -450,14 +450,24 @@ class Service
 
                 return ['status'=>200, 'goals'=>$goals, 'goal_steps'=>$goal_steps];
             }
-            else{ // If search category is people
-                $clients = Client::select('id','first_name','last_name')
+            else if($request->search_category=='people'){ // If search category is people
+                $clients = Client::select('id','first_name','last_name','photo')
                     ->where('first_name', 'like', '%' . $request->text . '%')
                     ->orWhere('last_name', 'like', '%' . $request->text . '%')
                     ->get();
 
                 return ['status'=>200, 'clients'=>$clients];
             }
+            else if($request->search_category=='skill'){ // If search category is skill
+                $clients = Client::select('id','first_name','last_name','core_skills','photo')
+                    ->where('first_name', 'like', '%' . $request->text . '%')
+                    ->orWhere('last_name', 'like', '%' . $request->text . '%')
+                    ->orWhere('core_skills', 'like', '%' . $request->text . '%')
+                    ->get();
+
+                return ['status'=>200, 'clients'=>$clients];
+            }
+
 
 
 
