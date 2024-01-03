@@ -524,5 +524,19 @@ class Service
         }
     }
 
+    /*
+     * Getting collaborator details
+     * */
+    public static function getCollaboratorProfile($collaborator_id){
+        try{
+            $client = Client::select('clients.*')->where('clients.id',$collaborator_id)->first();
+
+            return ['status'=>200, 'data'=>$client];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
 
 }//End

@@ -600,4 +600,30 @@ class ApiController extends Controller
             return ['status' => 401,'reason' => $e->getMessage()];
         }
     }
+
+    /*
+     * Getting collaborator detail data
+     * */
+    public function getCollaboratorProfile(Request $request)
+    {
+        if (!Service::hasAccess($request->oAuth_token)) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->collaborator_id == '') {
+            return ['status'=>401, 'reason'=>'Collaborator id is required'];
+        }
+        try {
+            $result = Service::getCollaboratorProfile($request->collaborator_id);
+            if($result['status']==200){
+                return ['status' => 200,'data'=>$result['data']];
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
 }
