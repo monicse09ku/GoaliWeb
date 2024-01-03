@@ -5,6 +5,7 @@ use App\Models\Client;
 use App\Models\Genre;
 use App\Models\Goal;
 use App\Models\GoalStep;
+use App\Models\GoalCollaborator;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Mail;
@@ -424,6 +425,72 @@ class Service
             $goal_step->save();
 
             return ['status'=>200, 'id'=>$goal_step->id];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
+     * Search goal/step
+     * */
+    public static function search($request){
+        try{
+            if($request->search_category=='goal'){
+                $goals= Goal::select('id','goal_name')
+                    ->where('goal_name', 'like', '%' . $request->text . '%')
+                    ->where('client_id', $request->client_id)
+                    ->get();
+
+                $goal_steps = GoalStep::select('goal_steps.id','goal_steps.step_name')
+                    ->join('goals','goals.id','=','goal_steps.goal_id')
+                    ->where('step_name', 'like', '%' . $request->text . '%')
+                    ->where('goals.client_id', $request->client_id)
+                    ->get();
+
+                return ['status'=>200, 'goals'=>$goals, 'goal_steps'=>$goal_steps];
+            }
+            else{ // If search category is people
+                $clients = Client::select('id','first_name','last_name')
+                    ->where('first_name', 'like', '%' . $request->text . '%')
+                    ->orWhere('last_name', 'like', '%' . $request->text . '%')
+                    ->get();
+
+                return ['status'=>200, 'clients'=>$clients];
+            }
+
+
+
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
+     * Adding collaborators to goal
+     * */
+    public static function addCollaborators($request){
+        try{
+            $collaborators = explode(',',$request->collaborators);
+            foreach($collaborators as $collaborator){
+                /*
+                 * Check if collaborators already added
+                 * */
+                $ext_collaborator = GoalCollaborator::where('goal_id',$request->goal_id)
+                    ->where('collaborator_id',$collaborator)
+                    ->where('status','!=','deleted')
+                    ->first();
+
+                if(empty($ext_collaborator)){
+                    $goal_collaborator = NEW GoalCollaborator();
+                    $goal_collaborator->goal_id = $request->goal_id;
+                    $goal_collaborator->collaborator_id = $collaborator;
+                    $goal_collaborator->created_at = date('Y-m-d h:i:s');
+                    $goal_collaborator->save();
+                }
+            }
+            return ['status'=>200, 'reason'=>'Collaborators added successfully'];
         }
         catch(\Exception $e){
             return ['status'=>401, 'reason'=>$e->getMessage()];

@@ -501,4 +501,67 @@ class ApiController extends Controller
             return ['status' => 401,'reason' => $e->getMessage()];
         }
     }
+
+    /*
+     * Search goal/step
+     * */
+    public function search(Request $request)
+    {
+        if (!Service::hasAccess($request->oAuth_token)) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->search_category == '') {
+            return ['status'=>401, 'reason'=>'Search category is is required'];
+        }
+        if ($request->text == '') {
+            return ['status'=>401, 'reason'=>'Text is is required'];
+        }
+        try {
+            $result = Service::search($request);
+            if($result['status']==200){
+                if($request->search_category=='goal') {
+                    return ['status' => 200, 'goals' => $result['goals'], 'goal_steps' => $result['goal_steps']];
+                }
+                else{ // If search category is people
+                    return ['status' => 200, 'clients' => $result['clients']];
+                }
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
+     * Adding goal collaborators
+     * */
+    public function addCollaborators(Request $request)
+    {
+        if (!Service::hasAccess($request->oAuth_token)) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->goal_id == '') {
+            return ['status'=>401, 'reason'=>'goal id is required'];
+        }
+        if ($request->collaborators == '') {
+            return ['status'=>401, 'reason'=>'collaborators is required'];
+        }
+        try {
+            $result = Service::addCollaborators($request);
+            if($result['status']==200){
+                return ['status' => 200,'reason' => 'Collaborators added successfully'];
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
 }

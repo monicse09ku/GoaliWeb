@@ -17,9 +17,10 @@ class CreateGoalCollaboratorsTable extends Migration
             $table->id();
             $table->integer('goal_id');
             $table->integer('collaborator_id');
-            $table->date('accepted_at');
+            $table->date('accepted_at')->nullable();
             $table->enum('status', ['active','inactive','deleted'])->default('active');
             $table->timestamps();
+            $table->timestamp('deleted_at')->nullable();
         });
     }
 
