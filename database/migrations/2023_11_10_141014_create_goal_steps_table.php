@@ -24,6 +24,8 @@ class CreateGoalStepsTable extends Migration
             $table->string('step_occurrence')->nullable();
             $table->string('step_occurrence_weekdays')->nullable();
             $table->text('attachments')->nullable();
+            $table->tinyInteger('is_complete')->default(0)->nullable();
+            $table->timestamps('completed_at')->nullable();
             $table->enum('status', ['active','inactive','deleted'])->default('active');
             $table->timestamps();
             $table->timestamp('deleted_at')->nullable();

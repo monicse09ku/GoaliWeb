@@ -432,6 +432,23 @@ class Service
     }
 
     /*
+     * Making goal step complete
+     * */
+    public static function makeCompleteGoalStep($request){
+        try{
+            $goal_step = GoalStep::where('id',$request->step_id)->first();
+            $goal_step->is_complete = 1;
+            $goal_step->completed_at = date('Y-m-d h:i:s');
+            $goal_step->save();
+
+            return ['status'=>200, 'id'=>$goal_step->id];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
      * Search goal/step
      * */
     public static function search($request){

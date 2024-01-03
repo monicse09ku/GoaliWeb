@@ -503,6 +503,32 @@ class ApiController extends Controller
     }
 
     /*
+     * Making goal step complete
+     * */
+    public function makeCompleteGoalStep(Request $request)
+    {
+        if (!Service::hasAccess($request->oAuth_token)) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->step_id == '') {
+            return ['status'=>401, 'reason'=>'Step id is required'];
+        }
+        try {
+            $result = Service::makeCompleteGoalStep($request);
+            if($result['status']==200){
+                return ['status' => 200,'reason' => 'Goal step successfully completed'];
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
      * Search goal/step
      * */
     public function search(Request $request)
