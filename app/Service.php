@@ -538,5 +538,27 @@ class Service
         }
     }
 
+    /*
+     * Getting client's completed goal details
+     * */
+    public static function getTrophies($request){
+        try{
+            $goals = Goal::select('goals.*');
+            $goals = $goals->where('goals.client_id',$request->client_id);
+            $goals = $goals->where('completion_percentage',100);
+            if($request->goal_name != ''){
+                $goals = $goals->where('goal_name', 'like', '%' . $request->goal_name . '%');
+            }
+            $goals = $goals->get();
+
+            $data['completed_goals'] = $goals;
+
+            return ['status'=>200, 'data'=>$data];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
 
 }//End

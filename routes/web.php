@@ -66,6 +66,7 @@ Route::post('service/goal_step/make_complete', [App\Http\Controllers\ApiControll
 
 Route::post('service/search', [App\Http\Controllers\ApiController::class, 'search']);
 Route::post('service/collaborator_profile', [App\Http\Controllers\ApiController::class, 'getCollaboratorProfile']);
+Route::post('service/trophies', [App\Http\Controllers\ApiController::class, 'getTrophies']);
 
 
 Auth::routes();
