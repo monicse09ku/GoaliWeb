@@ -543,17 +543,53 @@ class Service
      * */
     public static function getTrophies($request){
         try{
+            //Getting total current goals
+            $current_goals = Goal::select('goals.*');
+            $current_goals = $current_goals->where('goals.client_id',$request->client_id);
+            $current_goals = $current_goals->where('completion_percentage','<',100);
+            $current_goals = $current_goals->where('status','!=','deleted');
+            $current_goals = $current_goals->count();
+
+            //Getting total completed goals
+            $completed_goals = Goal::select('goals.*');
+            $completed_goals = $completed_goals->where('goals.client_id',$request->client_id);
+            $completed_goals = $completed_goals->where('completion_percentage',100);
+            $completed_goals = $completed_goals->where('status','!=','deleted');
+            $completed_goals = $completed_goals->get();
+
+            //Getting total deleted goals
+            $archieved_goals = Goal::select('goals.*');
+            $archieved_goals = $archieved_goals->where('goals.client_id',$request->client_id);
+            $archieved_goals = $archieved_goals->where('status','deleted');
+            $archieved_goals = $archieved_goals->count();
+
+            $data['total_current_goal'] = $current_goals;
+            $data['total_completed_goal'] = count($completed_goals);
+            $data['total_archieved_goal'] = $archieved_goals;
+
+            $data['completed_goals'] = $completed_goals;
+
+            return ['status'=>200, 'data'=>$data];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
+     * Searching client's completed goal
+     * */
+    public static function searchCompletedGoal($request){
+        try{
+            //Getting completed goals
             $goals = Goal::select('goals.*');
             $goals = $goals->where('goals.client_id',$request->client_id);
             $goals = $goals->where('completion_percentage',100);
-            if($request->goal_name != ''){
-                $goals = $goals->where('goal_name', 'like', '%' . $request->goal_name . '%');
-            }
+            $goals = $goals->where('status','!=','deleted');
+            $goals = $goals->where('goal_name', 'like', '%' . $request->goal_name . '%');
             $goals = $goals->get();
 
-            $data['completed_goals'] = $goals;
-
-            return ['status'=>200, 'data'=>$data];
+            return ['status'=>200, 'data'=>$goals];
         }
         catch(\Exception $e){
             return ['status'=>401, 'reason'=>$e->getMessage()];
