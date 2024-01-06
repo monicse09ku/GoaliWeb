@@ -583,6 +583,9 @@ class ApiController extends Controller
         if ($request->goal_id == '') {
             return ['status'=>401, 'reason'=>'goal id is required'];
         }
+        if ($request->client_id == '') {
+            return ['status'=>401, 'reason'=>'client id is required'];
+        }
         if ($request->collaborators == '') {
             return ['status'=>401, 'reason'=>'collaborators is required'];
         }
@@ -666,6 +669,58 @@ class ApiController extends Controller
         }
         try {
             $result = Service::searchCompletedGoal($request);
+            if($result['status']==200){
+                return ['status' => 200,'data'=>$result['data']];
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
+     * Get all notification for the client
+     * */
+    public function getNotifications(Request $request)
+    {
+        if (!Service::hasAccess($request->oAuth_token)) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->client_id == '') {
+            return ['status'=>401, 'reason'=>'Client id is required'];
+        }
+        try {
+            $result = Service::getNotifications($request);
+            if($result['status']==200){
+                return ['status' => 200,'data'=>$result['data']];
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
+     * Get notification details
+     * */
+    public function getNotificationDetails(Request $request)
+    {
+        if (!Service::hasAccess($request->oAuth_token)) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->notification_id == '') {
+            return ['status'=>401, 'reason'=>'Notification id is required'];
+        }
+        try {
+            $result = Service::getNotificationDetails($request->notification_id);
             if($result['status']==200){
                 return ['status' => 200,'data'=>$result['data']];
             }

@@ -6,6 +6,7 @@ use App\Models\Genre;
 use App\Models\Goal;
 use App\Models\GoalStep;
 use App\Models\GoalCollaborator;
+use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Mail;
@@ -45,37 +46,6 @@ class Service
         else{
             return 0;
         }
-    }
-
-    /*
-     * Get notifications
-     * */
-    public static function getNotifications($user_id=''){
-        if($user_id == ''){
-            $user = Auth::user();
-            if($user->role==7 || $user->role==8 || $user->role==9){ // If user is DGH, DGH viewer or DGH monitor
-                $user_id = Service::getParentZhc($user->id);
-            }
-            else{
-                $user_id = $user->id;
-            }
-        }
-
-        $notifications = Notification::select('notifications.*','notification_from.name as notification_from')
-            ->leftJoin('users as notification_from','notification_from.id','=','notifications.notification_from_id')
-            ->where('notification_to_id',$user_id)
-            ->orderBy('notifications.id','DESC')
-            ->get();
-        return $notifications;
-    }
-
-    public static function getNotificationDetails($notification_id=''){
-        $notifications = Notification::select('notifications.*','notification_from.name as notification_from')
-            ->leftJoin('users as notification_from','notification_from.id','=','notifications.notification_from_id')
-            ->where('notifications.id',$notification_id)
-            ->orderBy('notifications.id','DESC')
-            ->get();
-        return $notifications;
     }
 
     public static function getUnreadNotifications($user_id=''){
@@ -515,6 +485,23 @@ class Service
                     $goal_collaborator->collaborator_id = $collaborator;
                     $goal_collaborator->created_at = date('Y-m-d h:i:s');
                     $goal_collaborator->save();
+
+                    /*
+                     * Creating notification
+                     * */
+                    $notification_from  = Client::where('id',$request->client_id)->first();
+                    $goal  = Goal::where('id',$request->goal_id)->first();
+                    $notification_text = $notification_from->first_name.' '.$notification_from->last_name.' is inviting you to collaborate on '.$goal->goal_name;
+
+                    $notification = NEW Notification();
+                    $notification->notification_type = 'collaborator_request';
+                    $notification->notification_from_id = $request->client_id;
+                    $notification->notification_to_id = $collaborator;
+                    $notification->goal_id = $request->goal_id;
+                    $notification->link = '';
+                    $notification->text = $notification_text;
+                    $notification->sent_date = date('Y-m-d h:i:s');
+                    $notification->save();
                 }
             }
             return ['status'=>200, 'reason'=>'Collaborators added successfully'];
@@ -590,6 +577,43 @@ class Service
             $goals = $goals->get();
 
             return ['status'=>200, 'data'=>$goals];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
+     * Get all notifications for this client
+     * */
+    public static function getNotifications($request){
+        try{
+            $notifications = Notification::select('notifications.*',DB::raw("CONCAT(notification_from.first_name,' ',notification_from.last_name) as notification_from"), 'goals.goal_name')
+                ->leftJoin('clients as notification_from','notification_from.id','=','notifications.notification_from_id')
+                ->leftJoin('goals','goals.id','=','notifications.goal_id')
+                ->where('notification_to_id',$request->client_id)
+                ->orderBy('notifications.id','DESC')
+                ->get();
+
+            return ['status'=>200, 'data'=>$notifications];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
+     * Get notifications details
+     * */
+    public static function getNotificationDetails($notification_id=''){
+        try{
+            $notification = Notification::select('notifications.*',DB::raw("CONCAT(notification_from.first_name,' ',notification_from.last_name) as notification_from"), 'goals.goal_name')
+                ->leftJoin('clients as notification_from','notification_from.id','=','notifications.notification_from_id')
+                ->leftJoin('goals','goals.id','=','notifications.goal_id')
+                ->where('notifications.id',$notification_id)
+                ->first();
+
+            return ['status'=>200, 'data'=>$notification];
         }
         catch(\Exception $e){
             return ['status'=>401, 'reason'=>$e->getMessage()];

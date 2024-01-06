@@ -69,6 +69,9 @@ Route::post('service/collaborator_profile', [App\Http\Controllers\ApiController:
 Route::post('service/trophies', [App\Http\Controllers\ApiController::class, 'getTrophies']);
 Route::post('service/search_completed_goal', [App\Http\Controllers\ApiController::class, 'searchCompletedGoal']);
 
+Route::post('service/notification/all', [App\Http\Controllers\ApiController::class, 'getNotifications']);
+Route::post('service/notification/view', [App\Http\Controllers\ApiController::class, 'getNotificationDetails']);
+
 
 Auth::routes();
 
