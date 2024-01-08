@@ -124,9 +124,14 @@ class Service
             $client_update->user_id = $user->id;
             $client_update->save();
 
+            $user = User::select('users.id','users.name','users.email','users.phone','users.photo','users.role','users.oauth_token','clients.id as client_id')
+                ->join('clients','clients.user_id','=','users.id')
+                ->where('users.id',$user->id)
+                ->first();
+
             Db::commit();
 
-            return ['status'=>200, 'id'=>$client->id, 'token'=>$token, 'user'=>$user];
+            return ['status'=>200, 'token'=>$token, 'user'=>$user];
         }
         catch(\Exception $e){
             return ['status'=>401, 'reason'=>$e->getMessage()];
@@ -424,24 +429,42 @@ class Service
     public static function search($request){
         try{
             if($request->search_category=='goal'){
-                $goals= Goal::select('id','goal_name')
-                    ->where('goal_name', 'like', '%' . $request->text . '%')
-                    ->where('client_id', $request->client_id)
-                    ->get();
+                $goals= Goal::select('id','goal_name','genre_id','priority');
+                $goals = $goals->where('goal_name', 'like', '%' . $request->text . '%');
+                if($request->genre != ''){
+                    $goals = $goals->where('genre_id', $request->genre);
+                }
+                if($request->priority != ''){
+                    $goals = $goals->where('priority', $request->priority);
+                }
+                $goals = $goals->where('client_id', $request->client_id);
+                $goals = $goals->get();
 
-                $goal_steps = GoalStep::select('goal_steps.id','goal_steps.step_name')
-                    ->join('goals','goals.id','=','goal_steps.goal_id')
-                    ->where('step_name', 'like', '%' . $request->text . '%')
-                    ->where('goals.client_id', $request->client_id)
-                    ->get();
+                $goal_steps = GoalStep::select('goal_steps.id','goal_steps.step_name','goals.genre_id','goals.priority');
+                $goal_steps = $goal_steps->join('goals','goals.id','=','goal_steps.goal_id');
+                $goal_steps = $goal_steps->where('step_name', 'like', '%' . $request->text . '%');
+                if($request->genre != ''){
+                    $goals = $goals->where('goals.genre_id', $request->genre);
+                }
+                if($request->priority != ''){
+                    $goals = $goals->where('goals.priority', $request->priority);
+                }
+                $goal_steps = $goal_steps->where('goals.client_id', $request->client_id);
+                $goal_steps = $goal_steps->get();
 
                 return ['status'=>200, 'goals'=>$goals, 'goal_steps'=>$goal_steps];
             }
             else if($request->search_category=='people'){ // If search category is people
-                $clients = Client::select('id','first_name','last_name','photo')
-                    ->where('first_name', 'like', '%' . $request->text . '%')
-                    ->orWhere('last_name', 'like', '%' . $request->text . '%')
-                    ->get();
+                $text = $request->text;
+                $clients = Client::select('id','first_name','last_name','email','photo');
+                $clients = $clients->where(function($query) use ($text){
+                    $query->orwhere('first_name', 'like', '%' . $text . '%');
+                    $query->orwhere('last_name', 'like', '%' . $text . '%');
+                });
+                if($request->email != ''){
+                    $clients = $clients->where('email', $request->email);
+                }
+                $clients = $clients->get();
 
                 return ['status'=>200, 'clients'=>$clients];
             }
@@ -454,10 +477,44 @@ class Service
 
                 return ['status'=>200, 'clients'=>$clients];
             }
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
 
+    /*
+     * Search current goal
+     * */
+    public static function currentGoalSearch($request){
+        try{
+            if($request->goal_type=='Active' || $request->goal_type=='Active'){
+                $goals= Goal::select('id','goal_name','genre_id','priority');
+                $goals = $goals->where('goal_name', 'like', '%' . $request->text . '%');
+                $goals = $goals->where('goal_type', $request->goal_type);
+                if($request->genre != ''){
+                    $goals = $goals->where('genre_id', $request->genre);
+                }
+                if($request->priority != ''){
+                    $goals = $goals->where('priority', $request->priority);
+                }
+                $goals = $goals->where('client_id', $request->client_id);
+                $goals = $goals->get();
 
+                $goal_steps = GoalStep::select('goal_steps.id','goal_steps.step_name','goals.genre_id','goals.priority');
+                $goal_steps = $goal_steps->join('goals','goals.id','=','goal_steps.goal_id');
+                $goal_steps = $goal_steps->where('step_name', 'like', '%' . $request->text . '%');
+                if($request->genre != ''){
+                    $goals = $goals->where('goals.genre_id', $request->genre);
+                }
+                if($request->priority != ''){
+                    $goals = $goals->where('goals.priority', $request->priority);
+                }
+                $goal_steps = $goal_steps->where('goals.client_id', $request->client_id);
+                $goal_steps = $goal_steps->get();
 
-
+                return ['status'=>200, 'goals'=>$goals, 'goal_steps'=>$goal_steps];
+            }
         }
         catch(\Exception $e){
             return ['status'=>401, 'reason'=>$e->getMessage()];

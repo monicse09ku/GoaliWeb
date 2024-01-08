@@ -37,7 +37,8 @@ class ApiController extends Controller
 
             if ($result) {
                 $loggedUser = Auth::user();
-                $user = User::select('id','name','email','phone','photo','role','oauth_token')
+                $user = User::select('users.id','users.name','users.email','users.phone','users.photo','users.role','users.oauth_token','clients.id as client_id')
+                    ->join('clients','clients.user_id','=','users.id')
                     ->where('users.id',$loggedUser->id)
                     ->first();
 
@@ -149,7 +150,7 @@ class ApiController extends Controller
         try {
             $result = Service::storeClient($request);
             if($result['status']==200){
-                return ['status' => 200,'reason' => 'Successfully saved','id'=>$result['id'],'token'=>$result['token'],'user'=>$result['user']];
+                return ['status' => 200,'reason' => 'Successfully saved','token'=>$result['token'],'user'=>$result['user']];
             }
             else{
                 return ['status' => 401,'reason' => $result['reason']];

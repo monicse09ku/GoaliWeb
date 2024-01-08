@@ -65,6 +65,7 @@ Route::post('service/goal_step/delete', [App\Http\Controllers\ApiController::cla
 Route::post('service/goal_step/make_complete', [App\Http\Controllers\ApiController::class, 'makeCompleteGoalStep']);
 
 Route::post('service/search', [App\Http\Controllers\ApiController::class, 'search']);
+Route::post('service/current_goal_search', [App\Http\Controllers\ApiController::class, 'currentGoalSearch']);
 Route::post('service/collaborator_profile', [App\Http\Controllers\ApiController::class, 'getCollaboratorProfile']);
 Route::post('service/trophies', [App\Http\Controllers\ApiController::class, 'getTrophies']);
 Route::post('service/search_completed_goal', [App\Http\Controllers\ApiController::class, 'searchCompletedGoal']);
