@@ -557,6 +557,24 @@ class Service
 
                 return ['status'=>200, 'data'=>$goals];
             }
+            else if($request->goal_type=='Goal-Assist'){
+                $goals= GoalCollaborator::select('goals.*',DB::raw("CONCAT(clients.first_name,' ',clients.last_name) as owner"));
+                $goals = $goals->join('goals','goals.id','=','goal_collaborators.goal_id');
+                $goals = $goals->leftJoin('clients','clients.id','=','goals.client_id');
+                if($request->text != ''){
+                    $goals = $goals->where('goals.goal_name', 'like', '%' . $request->text . '%');
+                }
+                if($request->genre != ''){
+                    $goals = $goals->where('goals.genre_id', $request->genre);
+                }
+                if($request->priority != ''){
+                    $goals = $goals->where('goalspriority', $request->priority);
+                }
+                $goals = $goals->where('collaborator_id', $request->client_id);
+                $goals = $goals->get();
+
+                return ['status'=>200, 'data'=>$goals];
+            }
         }
         catch(\Exception $e){
             return ['status'=>401, 'reason'=>$e->getMessage()];
