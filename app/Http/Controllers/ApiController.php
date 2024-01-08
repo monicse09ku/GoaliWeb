@@ -574,6 +574,39 @@ class ApiController extends Controller
     }
 
     /*
+     * Search my current goal
+     * */
+    public function currentGoalSearch(Request $request)
+    {
+        if (!Service::hasAccess($request->oAuth_token)) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->client_id=='') {
+            return ['status'=>401, 'reason'=>'Client id is required'];
+        }
+        if ($request->goal_type == '') {
+            return ['status'=>401, 'reason'=>'Goal type is required'];
+        }
+        /*if ($request->text == '') {
+            return ['status'=>401, 'reason'=>'Text is required'];
+        }*/
+
+        try {
+            $result = Service::currentGoalSearch($request);
+            if($result['status']==200){
+                return ['status' => 200, 'data' => $result['data']];
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
      * Adding goal collaborators
      * */
     public function addCollaborators(Request $request)

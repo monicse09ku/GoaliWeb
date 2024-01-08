@@ -538,10 +538,14 @@ class Service
      * */
     public static function currentGoalSearch($request){
         try{
-            if($request->goal_type=='Active' || $request->goal_type=='Active'){
-                $goals= Goal::select('id','goal_name','genre_id','priority');
-                $goals = $goals->where('goal_name', 'like', '%' . $request->text . '%');
-                $goals = $goals->where('goal_type', $request->goal_type);
+            if($request->goal_type=='Active' || $request->goal_type=='Non-Active'){
+                $goals= Goal::select('goals.*');
+                if($request->text != ''){
+                    $goals = $goals->where('goal_name', 'like', '%' . $request->text . '%');
+                }
+                if($request->goal_type != ''){
+                    $goals = $goals->where('goal_type', $request->goal_type);
+                }
                 if($request->genre != ''){
                     $goals = $goals->where('genre_id', $request->genre);
                 }
@@ -551,19 +555,7 @@ class Service
                 $goals = $goals->where('client_id', $request->client_id);
                 $goals = $goals->get();
 
-                $goal_steps = GoalStep::select('goal_steps.id','goal_steps.step_name','goals.genre_id','goals.priority');
-                $goal_steps = $goal_steps->join('goals','goals.id','=','goal_steps.goal_id');
-                $goal_steps = $goal_steps->where('step_name', 'like', '%' . $request->text . '%');
-                if($request->genre != ''){
-                    $goals = $goals->where('goals.genre_id', $request->genre);
-                }
-                if($request->priority != ''){
-                    $goals = $goals->where('goals.priority', $request->priority);
-                }
-                $goal_steps = $goal_steps->where('goals.client_id', $request->client_id);
-                $goal_steps = $goal_steps->get();
-
-                return ['status'=>200, 'goals'=>$goals, 'goal_steps'=>$goal_steps];
+                return ['status'=>200, 'data'=>$goals];
             }
         }
         catch(\Exception $e){
