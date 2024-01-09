@@ -7,6 +7,7 @@ use App\Models\Goal;
 use App\Models\GoalStep;
 use App\Models\GoalCollaborator;
 use App\Models\Notification;
+use App\Models\Network;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Mail;
@@ -731,6 +732,98 @@ class Service
                 ->first();
 
             return ['status'=>200, 'data'=>$notification];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
+     * Getting my network connection
+     * */
+    public static function getMyNetworkConnection($request){
+        try{
+            $networks = Network::select('networks.id','clients.id as connected_with_id',DB::raw("CONCAT(clients.first_name,' ',clients.last_name) as connected_with_name"),'networks.status','users.phone','users.email','users.photo')
+                ->leftJoin('clients','clients.id','=','networks.connected_with_id')
+                ->leftJoin('users','users.id','=','clients.user_id')
+                ->where('networks.client_id',$request->client_id)
+                ->first();
+            return ['status'=>200, 'data'=>$networks];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
+     * add network connection
+     * */
+    public static function addNetworkConnection($request){
+        try{
+            $existing_network = Network::where('client_id',$request->client_id)
+                ->where('connected_with_id',$request->connected_with_id)
+                ->first();
+            if(!empty($existing_network)){
+                return ['status'=>401, 'reason'=>'This person already connected with you'];
+            }
+
+            $network = NEW Network();
+            $network->client_id = $request->client_id;
+            $network->connected_with_id = $request->connected_with_id;
+            $network->request_sent_date = date('Y-m-d h:i:s');
+            $network->save();
+
+
+            /*
+             * Creating notification
+             * */
+            $notification_from  = Client::where('id',$request->client_id)->first();
+            $notification_text = $notification_from->first_name.' '.$notification_from->last_name.' wants to connect with you';
+
+            $notification = NEW Notification();
+            $notification->notification_type = 'network_connection_request';
+            $notification->notification_from_id = $request->client_id;
+            $notification->notification_to_id = $request->connected_with_id;
+            $notification->link = '';
+            $notification->text = $notification_text;
+            $notification->sent_date = date('Y-m-d h:i:s');
+            $notification->save();
+
+            return ['status'=>200, 'reason'=>'Connection request successfully sent'];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
+     * Getting my network connection
+     * */
+    public static function viewNetworkConnection($network_id){
+        try{
+            $networks = Network::select('networks.id','cw.id as connected_with_id',DB::raw("CONCAT(c.first_name,' ',c.last_name) as connected_by_name"),DB::raw("CONCAT(cw.first_name,' ',cw.last_name) as connected_with_name"),'networks.status','users.phone','users.email','users.photo')
+                ->leftJoin('clients as c','c.id','=','networks.client_id')
+                ->leftJoin('clients as cw','cw.id','=','networks.connected_with_id')
+                ->leftJoin('users','users.id','=','cw.user_id')
+                ->where('networks.id',$network_id)
+                ->first();
+            return ['status'=>200, 'data'=>$networks];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
+     * Getting my network connection
+     * */
+    public static function acceptNetworkConnection($network_id){
+        try{
+            $networks = Network::where('networks.id',$network_id)->first();
+            $networks->status = 'accepted';
+            $networks->accept_date = date('Y-m-d h:i:s');
+            $networks->save();
+            return ['status'=>200, 'reason'=>'Connection accepted successfully'];
         }
         catch(\Exception $e){
             return ['status'=>401, 'reason'=>$e->getMessage()];
