@@ -210,7 +210,8 @@ class Service
      * */
     public static function getAllGoal($client_id=''){
         try{
-            $goals = Goal::select('goals.*');
+            $goals = Goal::with('steps');
+            $goals = $goals->select('goals.*');
             if($client_id != ''){
                 $goals = $goals->where('goals.client_id',$client_id);
             }
@@ -301,7 +302,7 @@ class Service
      * */
     public static function getGoalDetails($goal_id){
         try{
-            $goal = Goal::select('goals.*')->where('goals.id',$goal_id)->first();
+            $goal = Goal::with('steps')->select('goals.*')->where('goals.id',$goal_id)->first();
 
             return ['status'=>200, 'data'=>$goal];
         }
