@@ -481,6 +481,7 @@ class Service
     public static function search($request){
         try{
             if($request->search_category=='goal'){
+                // Get goals
                 $goals= Goal::select('id','goal_name','genre_id','priority');
                 $goals = $goals->where('goal_name', 'like', '%' . $request->text . '%');
                 if($request->genre != ''){
@@ -492,6 +493,7 @@ class Service
                 $goals = $goals->where('client_id', $request->client_id);
                 $goals = $goals->get();
 
+                // Get goal steps
                 $goal_steps = GoalStep::select('goal_steps.id','goal_steps.step_name','goals.genre_id','goals.priority');
                 $goal_steps = $goal_steps->join('goals','goals.id','=','goal_steps.goal_id');
                 $goal_steps = $goal_steps->where('step_name', 'like', '%' . $request->text . '%');
@@ -504,7 +506,20 @@ class Service
                 $goal_steps = $goal_steps->where('goals.client_id', $request->client_id);
                 $goal_steps = $goal_steps->get();
 
-                return ['status'=>200, 'goals'=>$goals, 'goal_steps'=>$goal_steps];
+                // Get goal assist
+                $goal_assists= GoalCollaborator::select('goals.id','goals.goal_name','goals.genre_id','goals.priority');
+                $goal_assists = $goal_assists->join('goals','goals.id','=','goal_collaborators.goal_id');
+                $goal_assists = $goal_assists->where('goals.goal_name', 'like', '%' . $request->text . '%');
+                if($request->genre != ''){
+                    $goal_assists = $goal_assists->where('goals.genre_id', $request->genre);
+                }
+                if($request->priority != ''){
+                    $goal_assists = $goal_assists->where('goals.priority', $request->priority);
+                }
+                $goal_assists = $goal_assists->where('collaborator_id', $request->client_id);
+                $goal_assists = $goal_assists->get();
+
+                return ['status'=>200, 'goals'=>$goals, 'goal_steps'=>$goal_steps, 'goal assist'=>$goal_assists];
             }
             else if($request->search_category=='people'){ // If search category is people
                 $text = $request->text;
@@ -570,7 +585,7 @@ class Service
                     $goals = $goals->where('goals.genre_id', $request->genre);
                 }
                 if($request->priority != ''){
-                    $goals = $goals->where('goalspriority', $request->priority);
+                    $goals = $goals->where('goals.priority', $request->priority);
                 }
                 $goals = $goals->where('collaborator_id', $request->client_id);
                 $goals = $goals->get();

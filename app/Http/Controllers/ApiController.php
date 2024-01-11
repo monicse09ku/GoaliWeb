@@ -549,6 +549,7 @@ class ApiController extends Controller
 
         try {
             $result = Service::search($request);
+            return $result;
             if($result['status']==200){
                 if($request->search_category=='goal') {
                     return ['status' => 200, 'goals' => $result['goals'], 'goal_steps' => $result['goal_steps']];
