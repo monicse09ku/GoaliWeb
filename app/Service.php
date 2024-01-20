@@ -468,6 +468,22 @@ class Service
             $goal_step->completed_at = date('Y-m-d h:i:s');
             $goal_step->save();
 
+            $completed_goal_steps = DB::select( DB::raw("SELECT COUNT(id) AS count, is_complete FROM `goal_steps` GROUP BY is_complete ORDER BY is_complete ASC") );
+            foreach($completed_goal_steps as $completed_goal_step){
+                $completed_count[$completed_goal_step->is_complete] = $completed_goal_step->count;
+            }
+
+            if(!isset($completed_count[0])){
+                $percentage = 100;
+            }else if(!isset($completed_count[1])){
+                $percentage = 0;
+            }else{
+                $percentage = round(($completed_count[1]/($completed_count[0] + $completed_count[1])) * 100, 2);
+            }
+            Goal::where('id', $goal_step->goal_id)->update([
+                'completion_percentage' => $percentage
+            ]);
+
             return ['status'=>200, 'id'=>$goal_step->id];
         }
         catch(\Exception $e){
