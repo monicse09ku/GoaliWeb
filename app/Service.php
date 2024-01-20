@@ -556,7 +556,9 @@ class Service
     public static function currentGoalSearch($request){
         try{
             if($request->goal_type=='Active' || $request->goal_type=='Non-Active'){
-                $goals= Goal::select('goals.*');
+                $goals= Goal::with(['steps'=>function($query){
+                            $query->select('*')->where('is_complete', 0)->limit(1);
+                        }])->select('goals.*');
                 if($request->text != ''){
                     $goals = $goals->where('goal_name', 'like', '%' . $request->text . '%');
                 }
