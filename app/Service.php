@@ -484,6 +484,8 @@ class Service
                 // Get goals
                 $goals= Goal::select('id','goal_name','genre_id','priority');
                 $goals = $goals->where('goal_name', 'like', '%' . $request->text . '%');
+                //$goals = $goals->where('priority', 2);
+                //$goals = $goals->where('genre_id', 1);
                 if($request->genre != ''){
                     $goals = $goals->where('genre_id', $request->genre);
                 }
@@ -531,7 +533,21 @@ class Service
                 if($request->email != ''){
                     $clients = $clients->where('email', $request->email);
                 }
+                $clients = $clients->where('id','!=', $request->client_id); // Ignoring self search
                 $clients = $clients->get();
+
+                foreach($clients as $key=>$client){
+                    $network = Network::where('client_id',$request->client_id)
+                        ->where('connected_with_id',$client->id)
+                        ->first();
+
+                    if(!empty($network)){
+                        $clients[$key]['connection_status'] = $network->status;
+                    }
+                    else{
+                        $clients[$key]['connection_status'] = 'not connected';
+                    }
+                }
 
                 return ['status'=>200, 'clients'=>$clients];
             }
@@ -800,6 +816,7 @@ class Service
             $notification->notification_type = 'network_connection_request';
             $notification->notification_from_id = $request->client_id;
             $notification->notification_to_id = $request->connected_with_id;
+            $notification->network_id = $network->id;
             $notification->link = '';
             $notification->text = $notification_text;
             $notification->sent_date = date('Y-m-d h:i:s');
