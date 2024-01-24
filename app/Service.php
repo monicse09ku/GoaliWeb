@@ -245,15 +245,31 @@ class Service
             /*
              * Adding collaborators
              * */
-            $collaborators = explode(',',$request->collaborators);
+            if(!empty($request->collaborators)){
+                $collaborators = explode(',',$request->collaborators);
+                foreach($collaborators as $collaborator){
+                    $goal_collaborator = NEW GoalCollaborator();
+                    $goal_collaborator->goal_id = $goal->id;
+                    $goal_collaborator->collaborator_id = $collaborator;
+                    $goal_collaborator->created_at = date('Y-m-d h:i:s');
+                    $goal_collaborator->save();
 
-            foreach($collaborators as $collaborator){
-                $goal_collaborator = NEW GoalCollaborator();
-                $goal_collaborator->goal_id = $goal->id;
-                $goal_collaborator->collaborator_id = $collaborator;
-                $goal_collaborator->created_at = date('Y-m-d h:i:s');
-                $goal_collaborator->save();
+                    /*
+                     * Creating notification
+                     * */
+                    $notification_from  = Client::where('id',$request->client_id)->first();
+                    $notification_text = $notification_from->first_name.' '.$notification_from->last_name.' is inviting you to collaborate on '.$goal->goal_name;
 
+                    $notification = NEW Notification();
+                    $notification->notification_type = 'collaborator_request';
+                    $notification->notification_from_id = $request->client_id;
+                    $notification->notification_to_id = $collaborator;
+                    $notification->goal_id = $request->goal_id;
+                    $notification->link = '';
+                    $notification->text = $notification_text;
+                    $notification->sent_date = date('Y-m-d h:i:s');
+                    $notification->save();
+                }                
                 /*
                  * Creating notification
                  * */
@@ -270,22 +286,6 @@ class Service
                 $notification->sent_date = date('Y-m-d h:i:s');
                 $notification->save();
             }
-
-            /*
-             * Creating notification
-             * */
-            $notification_from  = Client::where('id',$request->client_id)->first();
-            $notification_text = $notification_from->first_name.' '.$notification_from->last_name.' is inviting you to collaborate on '.$goal->goal_name;
-
-            $notification = NEW Notification();
-            $notification->notification_type = 'collaborator_request';
-            $notification->notification_from_id = $request->client_id;
-            $notification->notification_to_id = $collaborator;
-            $notification->goal_id = $request->goal_id;
-            $notification->link = '';
-            $notification->text = $notification_text;
-            $notification->sent_date = date('Y-m-d h:i:s');
-            $notification->save();
 
             DB::commit();
 
@@ -468,6 +468,22 @@ class Service
             $goal_step->completed_at = date('Y-m-d h:i:s');
             $goal_step->save();
 
+            $completed_goal_steps = DB::select( DB::raw("SELECT COUNT(id) AS count, is_complete FROM `goal_steps` GROUP BY is_complete ORDER BY is_complete ASC") );
+            foreach($completed_goal_steps as $completed_goal_step){
+                $completed_count[$completed_goal_step->is_complete] = $completed_goal_step->count;
+            }
+
+            if(!isset($completed_count[0])){
+                $percentage = 100;
+            }else if(!isset($completed_count[1])){
+                $percentage = 0;
+            }else{
+                $percentage = round(($completed_count[1]/($completed_count[0] + $completed_count[1])) * 100, 2);
+            }
+            Goal::where('id', $goal_step->goal_id)->update([
+                'completion_percentage' => $percentage
+            ]);
+
             return ['status'=>200, 'id'=>$goal_step->id];
         }
         catch(\Exception $e){
@@ -572,7 +588,9 @@ class Service
     public static function currentGoalSearch($request){
         try{
             if($request->goal_type=='Active' || $request->goal_type=='Non-Active'){
-                $goals= Goal::select('goals.*');
+                $goals= Goal::with(['steps'=>function($query){
+                            $query->select('*')->where('is_complete', 0)->limit(1);
+                        }])->select('goals.*');
                 if($request->text != ''){
                     $goals = $goals->where('goal_name', 'like', '%' . $request->text . '%');
                 }
