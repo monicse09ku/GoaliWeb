@@ -269,7 +269,7 @@ class Service
                     $notification->text = $notification_text;
                     $notification->sent_date = date('Y-m-d h:i:s');
                     $notification->save();
-                }                
+                }
                 /*
                  * Creating notification
                  * */
@@ -797,7 +797,7 @@ class Service
                 ->leftJoin('clients','clients.id','=','networks.connected_with_id')
                 ->leftJoin('users','users.id','=','clients.user_id')
                 ->where('networks.client_id',$request->client_id)
-                ->first();
+                ->get();
             return ['status'=>200, 'data'=>$networks];
         }
         catch(\Exception $e){
