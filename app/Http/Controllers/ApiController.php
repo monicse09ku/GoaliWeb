@@ -901,4 +901,59 @@ class ApiController extends Controller
             return ['status' => 401,'reason' => $e->getMessage()];
         }
     }
+
+    /*
+     * Decline network connection
+     * */
+    public function declineNetworkConnection(Request $request)
+    {
+        if (!Service::hasAccess($request->oAuth_token)) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->network_id == '') {
+            return ['status'=>401, 'reason'=>'Network id is required'];
+        }
+        if ($request->notification_id == '') {
+            return ['status'=>401, 'reason'=>'Notification id is required'];
+        }
+        try {
+            $result = Service::declineNetworkConnection($request);
+            if($result['status']==200){
+                return ['status' => 200,'reason'=>$result['reason']];
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
+     * Remove network connection
+     * */
+    public function removeNetworkConnection(Request $request)
+    {
+        if (!Service::hasAccess($request->oAuth_token)) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->network_id == '') {
+            return ['status'=>401, 'reason'=>'Network id is required'];
+        }
+        try {
+            $result = Service::removeNetworkConnection($request);
+            if($result['status']==200){
+                return ['status' => 200,'reason'=>$result['reason']];
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
 }

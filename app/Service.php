@@ -171,15 +171,9 @@ class Service
             if(isset($request->about_me)) {
                 $client->about_me = $request->about_me;
             }
-            if(isset($request->hobbies) && $request->hobbies != ''){
-                $client->hobbies = implode(',',$request->hobbies);
-            }
-            if(isset($request->language) && $request->language != ''){
-                $client->languages = implode(',',$request->language);
-            }
-            if(isset($request->core_skills) && $request->core_skills != ''){
-                $client->core_skills = implode(',',$request->core_skills);
-            }
+            $client->hobbies = $request->hobbies;
+            $client->languages = $request->language;
+            $client->core_skills = $request->core_skills;
             $client->updated_at = date('Y-m-d h:i:s');
             $client->save();
 
@@ -210,7 +204,7 @@ class Service
      * */
     public static function getAllGoal($client_id=''){
         try{
-            $goals = Goal::with('steps');
+            $goals = Goal::with('steps','collaborators');
             $goals = $goals->select('goals.*');
             if($client_id != ''){
                 $goals = $goals->where('goals.client_id',$client_id);
@@ -902,7 +896,7 @@ class Service
     }
 
     /*
-     * Getting my network connection
+     * Accept network connection request
      * */
     public static function acceptNetworkConnection($network_id){
         try{
@@ -911,6 +905,39 @@ class Service
             $networks->accept_date = date('Y-m-d h:i:s');
             $networks->save();
             return ['status'=>200, 'reason'=>'Connection accepted successfully'];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
+     * Decline network connection request
+     * */
+    public static function declineNetworkConnection($request){
+        try{
+            // Remove from network table
+            Network::where('networks.id',$request->network_id)->delete();
+
+            // Now remove from notification table
+            Notification::where('id',$request->notification_id)->delete();
+
+            return ['status'=>200, 'reason'=>'Connection declined'];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
+     * Remove network connection
+     * */
+    public static function removeNetworkConnection($request){
+        try{
+            // Remove from network table
+            Network::where('networks.id',$request->network_id)->delete();
+
+            return ['status'=>200, 'reason'=>'Connection removed'];
         }
         catch(\Exception $e){
             return ['status'=>401, 'reason'=>$e->getMessage()];

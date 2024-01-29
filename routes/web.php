@@ -78,6 +78,8 @@ Route::post('service/network/my_connection', [App\Http\Controllers\ApiController
 Route::post('service/network/request_connect', [App\Http\Controllers\ApiController::class, 'addNetworkConnection']);
 Route::post('service/network/view_connection', [App\Http\Controllers\ApiController::class, 'viewNetworkConnection']);
 Route::post('service/network/request_accept', [App\Http\Controllers\ApiController::class, 'acceptNetworkConnection']);
+Route::post('service/network/request_decline', [App\Http\Controllers\ApiController::class, 'declineNetworkConnection']);
+Route::post('service/network/remove_connection', [App\Http\Controllers\ApiController::class, 'removeNetworkConnection']);
 
 
 Auth::routes();
