@@ -57,6 +57,7 @@ Route::post('service/goal/view', [App\Http\Controllers\ApiController::class, 'ge
 Route::post('service/goal/update', [App\Http\Controllers\ApiController::class, 'updateGoal']);
 Route::post('service/goal/delete', [App\Http\Controllers\ApiController::class, 'deleteGoal']);
 Route::post('service/goal/add_collaborators', [App\Http\Controllers\ApiController::class, 'addCollaborators']);
+Route::post('service/goal/make_complete', [App\Http\Controllers\ApiController::class, 'makeCompleteGoal']);
 
 Route::post('service/goal_step/store', [App\Http\Controllers\ApiController::class, 'storeGoalStep']);
 Route::post('service/goal_step/view', [App\Http\Controllers\ApiController::class, 'getGoalStepDetails']);

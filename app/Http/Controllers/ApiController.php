@@ -388,6 +388,32 @@ class ApiController extends Controller
         }
     }
 
+    /*
+     * Making goal complete
+     * */
+    public function makeCompleteGoal(Request $request)
+    {
+        if (!Service::hasAccess($request->oAuth_token)) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->goal_id == '') {
+            return ['status'=>401, 'reason'=>'Goal id is required'];
+        }
+        try {
+            $result = Service::makeCompleteGoal($request);
+            if($result['status']==200){
+                return ['status' => 200,'reason' => 'Goal successfully completed'];
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
 
     /*
      * Saving new goal step data

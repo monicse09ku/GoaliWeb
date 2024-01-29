@@ -359,6 +359,23 @@ class Service
         }
     }
 
+    /*
+     * Making goal complete
+     * */
+    public static function makeCompleteGoal($request){
+        try{
+            $goal = Goal::where('id',$request->goal_id)->first();
+            $goal->completion_percentage = 100;
+            $goal->completed_at = date('Y-m-d h:i:s');
+            $goal->save();
+
+            return ['status'=>200, 'reason'=>'Successfully completed'];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
 
     /*
      * Saving goal step data
@@ -382,6 +399,11 @@ class Service
             }
             $goal_step->created_at = date('Y-m-d h:i:s');
             $goal_step->save();
+
+            // Checking and making goal completed
+            Goal::where('id', $goal_step->goal_id)->update([
+                'completion_percentage' => self::getCompleteGoalStepPercent($goal_step->goal_id)
+            ]);
 
             return ['status'=>200, 'id'=>$goal_step->id];
         }
@@ -468,23 +490,37 @@ class Service
             $goal_step->completed_at = date('Y-m-d h:i:s');
             $goal_step->save();
 
-            $completed_goal_steps = DB::select( DB::raw("SELECT COUNT(id) AS count, is_complete FROM `goal_steps` GROUP BY is_complete ORDER BY is_complete ASC") );
-            foreach($completed_goal_steps as $completed_goal_step){
-                $completed_count[$completed_goal_step->is_complete] = $completed_goal_step->count;
-            }
-
-            if(!isset($completed_count[0])){
-                $percentage = 100;
-            }else if(!isset($completed_count[1])){
-                $percentage = 0;
-            }else{
-                $percentage = round(($completed_count[1]/($completed_count[0] + $completed_count[1])) * 100, 2);
-            }
+            // Checking and making goal completed
             Goal::where('id', $goal_step->goal_id)->update([
-                'completion_percentage' => $percentage
+                'completion_percentage' => self::getCompleteGoalStepPercent($goal_step->goal_id)
             ]);
 
             return ['status'=>200, 'id'=>$goal_step->id];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
+     * Making goal step complete
+     * */
+    private static function getCompleteGoalStepPercent($goal_id){
+        try{
+            $total_steps = GoalStep::where('goal_id',$goal_id)->where('status','active')->count();
+            $completed_steps = GoalStep::where('goal_id',$goal_id)->where('is_complete',1)->where('status','active')->count();
+
+            if($completed_steps==0){
+                $percentage = 0;
+            }
+            else if($completed_steps==$total_steps){
+                $percentage = 100;
+            }
+            else{
+                $percentage = ($completed_steps/$total_steps)*100;
+            }
+            return $percentage;
+
         }
         catch(\Exception $e){
             return ['status'=>401, 'reason'=>$e->getMessage()];
