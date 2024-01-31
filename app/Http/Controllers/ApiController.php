@@ -173,11 +173,11 @@ class ApiController extends Controller
         if (!Service::hasAccess($request->oAuth_token)) {
             return ['status'=>401, 'reason'=>'Invalid oAuth token'];
         }
-        if ($request->client_id == '') {
+        if ($request->id == '') {
             return ['status'=>401, 'reason'=>'Client id is required'];
         }
         try {
-            $result = Service::getClientDetails($request->client_id);
+            $result = Service::getClientDetails($request->id);
             if($result['status']==200){
                 return ['status' => 200,'data'=>$result['data']];
             }
