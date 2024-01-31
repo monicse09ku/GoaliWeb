@@ -413,6 +413,13 @@ class Service
         try{
             $goal_step = GoalStep::select('goal_steps.*')->where('goal_steps.id',$step_id)->first();
 
+            $collaborators = GoalCollaborator::select('clients.id as collaborator_id',DB::raw("CONCAT(clients.first_name,' ',clients.last_name) as collaborator_name"));
+            $collaborators = $collaborators->leftJoin('clients','clients.id','=','goal_collaborators.collaborator_id');
+            $collaborators = $collaborators->where('goal_id', $goal_step->goal_id);
+            $collaborators = $collaborators->get();
+
+            $goal_step['collaborators'] = $collaborators;
+
             return ['status'=>200, 'data'=>$goal_step];
         }
         catch(\Exception $e){
