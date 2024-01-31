@@ -731,6 +731,37 @@ class Service
     }
 
     /*
+     * Removing collaborators to goal
+     * */
+    public static function deleteCollaborators($request){
+        try{
+            $goal = Goal::where('id',$request->goal_id)->first();
+            GoalCollaborator::where('goal_id',$request->goal_id)
+                ->where('collaborator_id',$request->collaborator_id)->delete();
+
+            /*
+             * Creating notification
+             * */
+            $notification_from  = Client::where('id',$goal->client_id)->first();
+            $notification_text = $notification_from->first_name.' '.$notification_from->last_name.' has removed you as collaborator from '.$goal->goal_name;
+
+            $notification = NEW Notification();
+            $notification->notification_type = 'collaborator_removal';
+            $notification->notification_from_id = $goal->client_id;
+            $notification->notification_to_id = $request->collaborator_id;
+            $notification->goal_id = $request->goal_id;
+            $notification->link = '';
+            $notification->text = $notification_text;
+            $notification->sent_date = date('Y-m-d h:i:s');
+            $notification->save();
+            return ['status'=>200, 'reason'=>'Collaborators removed successfully'];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
      * Getting client's completed goal details
      * */
     public static function getTrophies($request){

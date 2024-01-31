@@ -692,6 +692,35 @@ class ApiController extends Controller
     }
 
     /*
+     * Removing goal collaborators
+     * */
+    public function deleteCollaborators(Request $request)
+    {
+        if (!Service::hasAccess($request->oAuth_token)) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->goal_id == '') {
+            return ['status'=>401, 'reason'=>'goal id is required'];
+        }
+        if ($request->collaborator_id == '') {
+            return ['status'=>401, 'reason'=>'collaborator id is required'];
+        }
+        try {
+            $result = Service::deleteCollaborators($request);
+            if($result['status']==200){
+                return ['status' => 200,'reason' => 'Collaborators removed successfully'];
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
      * Getting clients completed goal details
      * */
     public function getTrophies(Request $request)
