@@ -74,6 +74,7 @@ Route::post('service/search_completed_goal', [App\Http\Controllers\ApiController
 
 Route::post('service/notification/all', [App\Http\Controllers\ApiController::class, 'getNotifications']);
 Route::post('service/notification/view', [App\Http\Controllers\ApiController::class, 'getNotificationDetails']);
+Route::post('service/notification/update', [App\Http\Controllers\ApiController::class, 'updateNotification']);
 
 Route::post('service/network/my_connection', [App\Http\Controllers\ApiController::class, 'getMyNetworkConnection']);
 Route::post('service/network/request_connect', [App\Http\Controllers\ApiController::class, 'addNetworkConnection']);

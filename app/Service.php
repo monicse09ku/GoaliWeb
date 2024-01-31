@@ -857,6 +857,25 @@ class Service
     }
 
     /*
+     * Update notifications details
+     * */
+    public static function updateNotification($request){
+        try{
+            $notification = Notification::where('notifications.id',$request->notification_id)->first();
+            if($request->action != ''){
+                $notification->action = $request->action;
+            }
+            $notification->updated_at = date('Y-m-d h:i:s');
+            $notification->save();
+
+            return ['status'=>200, 'reason'=>'Successfully updated'];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
      * Getting my network connection
      * */
     public static function getMyNetworkConnection($request){

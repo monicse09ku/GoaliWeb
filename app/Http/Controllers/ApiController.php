@@ -825,6 +825,32 @@ class ApiController extends Controller
     }
 
     /*
+     * Update notification details
+     * */
+    public function updateNotification(Request $request)
+    {
+        if (!Service::hasAccess($request->oAuth_token)) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->notification_id == '') {
+            return ['status'=>401, 'reason'=>'Notification id is required'];
+        }
+        try {
+            $result = Service::updateNotification($request);
+            if($result['status']==200){
+                return ['status' => 200,'reason'=>$result['reason']];
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
      * add network connection
      * */
     public function getMyNetworkConnection(Request $request)
