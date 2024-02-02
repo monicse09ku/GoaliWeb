@@ -880,11 +880,20 @@ class Service
      * */
     public static function getMyNetworkConnection($request){
         try{
-            $networks = Network::select('networks.id','clients.id as connected_with_id',DB::raw("CONCAT(clients.first_name,' ',clients.last_name) as connected_with_name"),'networks.status','users.phone','users.email','users.photo')
+            $networks_to = Network::select('networks.id','clients.id as connected_with_id',DB::raw("CONCAT(clients.first_name,' ',clients.last_name) as connected_with_name"),'networks.status','users.phone','users.email','users.photo')
                 ->leftJoin('clients','clients.id','=','networks.connected_with_id')
                 ->leftJoin('users','users.id','=','clients.user_id')
                 ->where('networks.client_id',$request->client_id)
-                ->get();
+                ->get()->toArray();
+
+            $networks_from = Network::select('networks.id','clients.id as connected_with_id',DB::raw("CONCAT(clients.first_name,' ',clients.last_name) as connected_with_name"),'networks.status','users.phone','users.email','users.photo')
+                ->leftJoin('clients','clients.id','=','networks.client_id')
+                ->leftJoin('users','users.id','=','clients.user_id')
+                ->where('networks.connected_with_id',$request->client_id)
+                ->get()->toArray();
+
+            //$networks = array_merge($networks_to,$networks_from);
+            $networks = array_merge($networks_to, $networks_from);
             return ['status'=>200, 'data'=>$networks];
         }
         catch(\Exception $e){
