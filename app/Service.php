@@ -296,7 +296,7 @@ class Service
      * */
     public static function getGoalDetails($goal_id){
         try{
-            $goal = Goal::with('steps')->select('goals.*')->where('goals.id',$goal_id)->first();
+            $goal = Goal::with('steps','collaborators')->select('goals.*')->where('goals.id',$goal_id)->first();
 
             return ['status'=>200, 'data'=>$goal];
         }
