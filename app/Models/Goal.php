@@ -12,6 +12,7 @@ class Goal extends Model
     public function steps()
     {
         $instance = $this->hasMany('App\Models\GoalStep','goal_id','id');
+        $instance = $instance->where('goal_steps.status','active');
         return $instance;
     }
     public function collaborators()
