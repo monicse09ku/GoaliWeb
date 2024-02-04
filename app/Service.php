@@ -641,6 +641,7 @@ class Service
                     $goals = $goals->where('priority', $request->priority);
                 }
                 $goals = $goals->where('client_id', $request->client_id);
+                $goals = $goals->where('goals.status', 'active');
                 $goals = $goals->get();
 
                 return ['status'=>200, 'data'=>$goals];
@@ -659,6 +660,7 @@ class Service
                     $goals = $goals->where('goals.priority', $request->priority);
                 }
                 $goals = $goals->where('collaborator_id', $request->client_id);
+                $goals = $goals->where('goals.status', 'active');
                 $goals = $goals->get();
 
                 return ['status'=>200, 'data'=>$goals];
