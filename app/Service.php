@@ -546,6 +546,7 @@ class Service
                     $goals = $goals->where('priority', $request->priority);
                 }
                 $goals = $goals->where('client_id', $request->client_id);
+                $goals = $goals->where('goals.status', 'active');
                 $goals = $goals->get();
 
                 // Get goal steps
@@ -553,12 +554,13 @@ class Service
                 $goal_steps = $goal_steps->join('goals','goals.id','=','goal_steps.goal_id');
                 $goal_steps = $goal_steps->where('step_name', 'like', '%' . $request->text . '%');
                 if($request->genre != ''){
-                    $goals = $goals->where('goals.genre_id', $request->genre);
+                    $goal_steps = $goal_steps->where('goals.genre_id', $request->genre);
                 }
                 if($request->priority != ''){
-                    $goals = $goals->where('goals.priority', $request->priority);
+                    $goal_steps = $goal_steps->where('goals.priority', $request->priority);
                 }
                 $goal_steps = $goal_steps->where('goals.client_id', $request->client_id);
+                $goal_steps = $goal_steps->where('goal_steps.status', 'active');
                 $goal_steps = $goal_steps->get();
 
                 // Get goal assist
@@ -572,6 +574,7 @@ class Service
                     $goal_assists = $goal_assists->where('goals.priority', $request->priority);
                 }
                 $goal_assists = $goal_assists->where('collaborator_id', $request->client_id);
+                $goal_assists = $goal_assists->where('goals.status', 'active');
                 $goal_assists = $goal_assists->get();
 
                 return ['status'=>200, 'goals'=>$goals, 'goal_steps'=>$goal_steps, 'goal assist'=>$goal_assists];
