@@ -311,6 +311,8 @@ class Service
     public static function updateGoal($request)
     {
         try {
+            DB::beginTransaction();
+
             $goal = Goal::where('id', $request->goal_id)->first();
             if (isset($request->client_id)) {
                 $goal->client_id = $request->client_id;
@@ -330,8 +332,56 @@ class Service
             $goal->updated_at = date('Y-m-d h:i:s');
             $goal->save();
 
+            /*
+             * Adding collaborators
+             * */
+            if(!empty($request->collaborators)){
+                $collaborators = explode(',',$request->collaborators);
+                foreach($collaborators as $collaborator){
+                    $goal_collaborator = NEW GoalCollaborator();
+                    $goal_collaborator->goal_id = $goal->id;
+                    $goal_collaborator->collaborator_id = $collaborator;
+                    $goal_collaborator->created_at = date('Y-m-d h:i:s');
+                    $goal_collaborator->save();
+
+                    /*
+                     * Creating notification
+                     * */
+                    $notification_from  = Client::where('id',$request->client_id)->first();
+                    $notification_text = $notification_from->first_name.' '.$notification_from->last_name.' is inviting you to collaborate on '.$goal->goal_name;
+
+                    $notification = NEW Notification();
+                    $notification->notification_type = 'collaborator_request';
+                    $notification->notification_from_id = $request->client_id;
+                    $notification->notification_to_id = $collaborator;
+                    $notification->goal_id = $request->goal_id;
+                    $notification->link = '';
+                    $notification->text = $notification_text;
+                    $notification->sent_date = date('Y-m-d h:i:s');
+                    $notification->save();
+                }
+                /*
+                 * Creating notification
+                 * */
+                $notification_from  = Client::where('id',$request->client_id)->first();
+                $notification_text = $notification_from->first_name.' '.$notification_from->last_name.' is inviting you to collaborate on '.$goal->goal_name;
+
+                $notification = NEW Notification();
+                $notification->notification_type = 'collaborator_request';
+                $notification->notification_from_id = $request->client_id;
+                $notification->notification_to_id = $collaborator;
+                $notification->goal_id = $request->goal_id;
+                $notification->link = '';
+                $notification->text = $notification_text;
+                $notification->sent_date = date('Y-m-d h:i:s');
+                $notification->save();
+            }
+
+            DB::commit();
+
             return ['status' => 200, 'id' => $goal->id];
         } catch (\Exception $e) {
+            DB::rollback();
             return ['status' => 401, 'reason' => $e->getMessage()];
         }
     }
@@ -377,6 +427,7 @@ class Service
     public static function storeGoalStep($request){
         try{
             $goal_step = NEW GoalStep();
+            $goal_step->goal_id = $request->goal_id;
             $goal_step->goal_id = $request->goal_id;
             $goal_step->step_name = $request->step_name;
             $goal_step->description = $request->description;
