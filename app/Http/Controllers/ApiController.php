@@ -349,6 +349,7 @@ class ApiController extends Controller
         }
         try {
             $result = Service::updateGoal($request);
+            return $result;
             if($result['status']==200){
                 return ['status' => 200,'reason' => 'Successfully updated','id'=>$result['id']];
             }
