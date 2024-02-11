@@ -220,6 +220,7 @@ class ApiController extends Controller
         }
     }
 
+
     /*
      * Saving new client photo
      * */
