@@ -221,6 +221,30 @@ class ApiController extends Controller
     }
 
     /*
+     * Saving new client photo
+     * */
+    public function updateClientPhoto(Request $request)
+    {
+        if (!Service::hasAccess($request->oAuth_token)) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->client_id == '') {
+            return ['status'=>401, 'reason'=>'Client id is required'];
+        }
+        if ($request->photo == '') {
+            return ['status'=>401, 'reason'=>'Photo is required'];
+        }
+        try {
+            $result = Service::updateClientPhoto($request);
+            return $result;
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
      * Getting all genre data
      * */
     public function allGenre(Request $request)

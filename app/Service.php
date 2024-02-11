@@ -184,6 +184,50 @@ class Service
             return ['status'=>401, 'reason'=>$e->getMessage()];
         }
     }
+
+    /*
+     * Saving client photo
+     * */
+    public static function updateClientPhoto($request){
+        try{
+            $user = User::select('users.*')
+                ->join('clients','clients.user_id','users.id')
+                ->where('clients.id',$request->client_id)
+                ->first();
+
+            /*
+             * Uploading and updating clients profile photo
+             * */
+            $file_name = $user->username."-".time().".png";
+            $uri_path = "uploads/users/" . $file_name;
+            $full_path = public_path() .'/'. $uri_path;
+            $img = $request->photo;
+            $img = substr($img, strpos($img, ",")+1);
+            $data = base64_decode($img);
+            $success = file_put_contents($full_path, $data);
+            if($success){
+                // Updating photo path to users table
+                $user->photo = $uri_path;
+                $user->updated_at = date('Y-m-d h:i:s');
+                $user->save();
+
+                // Updating photo path to clients table
+                $client = Client::where('id',$request->client_id)->first();
+                $client->photo = $uri_path;
+                $client->updated_at = date('Y-m-d h:i:s');
+                $client->save();
+                return ['status'=>200, 'reason'=>'Successfully saved', 'file_path'=>$uri_path];
+            }
+            else{
+                return ['status'=>401, 'reason'=>'Unable to save the file.'];
+            }
+
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
     /*
      * Getting all genre
      * */
