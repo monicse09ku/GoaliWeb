@@ -6,6 +6,7 @@ use App\Models\Genre;
 use App\Models\Goal;
 use App\Models\GoalStep;
 use App\Models\GoalCollaborator;
+use App\Models\GoalStepAttachment;
 use App\Models\StepCollaborator;
 use App\Models\Notification;
 use App\Models\Network;
@@ -250,7 +251,7 @@ class Service
      * */
     public static function getAllGoal($client_id=''){
         try{
-            $goals = Goal::with('steps','collaborators');
+            $goals = Goal::with('steps.attachments','collaborators');
             $goals = $goals->select('goals.*');
             if($client_id != ''){
                 $goals = $goals->where('goals.client_id',$client_id);
@@ -327,7 +328,7 @@ class Service
      * */
     public static function getGoalDetails($goal_id){
         try{
-            $goal = Goal::with('steps','collaborators')->select('goals.*')->where('goals.id',$goal_id)->first();
+            $goal = Goal::with('steps.attachments','collaborators')->select('goals.*')->where('goals.id',$goal_id)->first();
 
             return ['status'=>200, 'data'=>$goal];
         }
@@ -474,6 +475,27 @@ class Service
             $goal_step->save();
 
             /*
+             * Uploading and updating clients attachments file
+             * */
+            if($request->file != ''){
+                $file_name = preg_replace('/\s+/', '', $request->step_name)."-".time().".".$request->file_type;
+                $uri_path = "uploads/goals/" . $file_name;
+                $full_path = public_path() .'/'. $uri_path;
+                $rile = $request->file;
+                $rile = substr($rile, strpos($rile, ",")+1);
+                $data = base64_decode($rile);
+                $success = file_put_contents($full_path, $data);
+                if($success){
+                    // Updating file path to step attachment table
+                    $step_attachment = NEW GoalStepAttachment();
+                    $step_attachment->goal_step_id = $goal_step->id;
+                    $step_attachment->file_type = $request->file_type;
+                    $step_attachment->file = $uri_path;
+                    $step_attachment->save();
+                }
+            }
+
+            /*
              * Adding collaborators
              * */
             if(!empty($request->collaborators)){
@@ -527,7 +549,7 @@ class Service
      * */
     public static function getGoalStepDetails($step_id){
         try{
-            $goal_step = GoalStep::with('collaborators')
+            $goal_step = GoalStep::with('attachments','collaborators')
                 ->select('goal_steps.*')
                 ->where('goal_steps.id',$step_id)
                 ->first();
@@ -571,6 +593,27 @@ class Service
             }
             $goal_step->updated_at = date('Y-m-d h:i:s');
             $goal_step->save();
+
+            /*
+             * Uploading and updating clients attachments file
+             * */
+            if($request->file != ''){
+                $file_name = preg_replace('/\s+/', '', $request->step_name)."-".time().".".$request->file_type;
+                $uri_path = "uploads/goals/" . $file_name;
+                $full_path = public_path() .'/'. $uri_path;
+                $file = $request->file;
+                $file = substr($file, strpos($file, ",")+1);
+                $data = base64_decode($file);
+                $success = file_put_contents($full_path, $data);
+                if($success){
+                    // Updating file path to step attachment table
+                    $step_attachment = NEW GoalStepAttachment();
+                    $step_attachment->goal_step_id = $goal_step->id;
+                    $step_attachment->file_type = $request->file_type;
+                    $step_attachment->file = $uri_path;
+                    $step_attachment->save();
+                }
+            }
 
             /*
              * Adding collaborators

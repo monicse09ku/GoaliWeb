@@ -15,4 +15,10 @@ class GoalStep extends Model
         $instance = $instance->leftJoin('clients','clients.id','=','step_collaborators.collaborator_id');
         return $instance;
     }
+
+    public function attachments()
+    {
+        $instance = $this->hasMany('App\Models\GoalStepAttachment','goal_step_id','id');
+        return $instance;
+    }
 }
