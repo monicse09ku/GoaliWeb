@@ -482,7 +482,7 @@ class Service
                 foreach($files as $file){
                     //$file_name = preg_replace('/\s+/', '', $request->step_name)."-".time().".".$request->file_type;
                     $file_name_data = explode('.',$file['name']);
-                    $file_name = $file_name_data[0].".".$request->file_type;
+                    $file_name = $file_name_data[0].".".$file['type'];
                     $uri_path = "uploads/goals/" . $file_name;
                     $full_path = public_path() .'/'. $uri_path;
                     $file_data = $file['data'];
@@ -607,7 +607,7 @@ class Service
                 foreach($files as $file){
                     //$file_name = preg_replace('/\s+/', '', $request->step_name)."-".time().".".$request->file_type;
                     $file_name_data = explode('.',$file['name']);
-                    $file_name = $file_name_data[0].".".$request->file_type;
+                    $file_name = $file_name_data[0].".".$file['type'];
                     $uri_path = "uploads/goals/" . $file_name;
                     $full_path = public_path() .'/'. $uri_path;
                     $file_data = $file['data'];
