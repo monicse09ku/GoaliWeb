@@ -36,7 +36,7 @@ Route::post('post_login', [App\Http\Controllers\AuthenticationController::class,
 Route::get('logout', 'AuthenticationController@logout');
 Route::get('logout', [App\Http\Controllers\AuthenticationController::class, 'logout']);
 
-Route::get('terms_conditions', [App\Http\Controllers\FrontController::class, 'terms_condition']);
+Route::get('terms-conditions', [App\Http\Controllers\FrontController::class, 'terms_condition']);
 
 //Route::get('error_404', 'ErrorController@error404');
 Route::get('error_404', [App\Http\Controllers\ErrorController::class, 'error404']);
