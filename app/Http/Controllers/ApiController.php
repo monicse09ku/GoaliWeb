@@ -446,7 +446,8 @@ class ApiController extends Controller
      * */
     public function storeGoalStep(Request $request)
     {
-        return $request->all();
+        $files = json_decode($request->files, true);
+        echo "<pre>"; print_r($files); echo "</pre>"; exit();
         if (!Service::hasAccess($request->oAuth_token)) {
             return ['status'=>401, 'reason'=>'Invalid oAuth token'];
         }
