@@ -481,7 +481,8 @@ class Service
                 $files = json_decode($request->file_data, true);
                 foreach($files as $file){
                     //$file_name = preg_replace('/\s+/', '', $request->step_name)."-".time().".".$request->file_type;
-                    $file_name = $file['name'];
+                    $file_name_data = explode('.',$file['name']);
+                    $file_name = $file_name_data[0].".".$request->file_type;
                     $uri_path = "uploads/goals/" . $file_name;
                     $full_path = public_path() .'/'. $uri_path;
                     $file_data = $file['data'];
@@ -601,11 +602,12 @@ class Service
             /*
              * Uploading and updating clients attachments file
              * */
-            if($request->files != ''){
-                $files = json_decode($request->files, true);
+            if($request->file_data != ''){
+                $files = json_decode($request->file_data, true);
                 foreach($files as $file){
                     //$file_name = preg_replace('/\s+/', '', $request->step_name)."-".time().".".$request->file_type;
-                    $file_name = $file['name'];
+                    $file_name_data = explode('.',$file['name']);
+                    $file_name = $file_name_data[0].".".$request->file_type;
                     $uri_path = "uploads/goals/" . $file_name;
                     $full_path = public_path() .'/'. $uri_path;
                     $file_data = $file['data'];
