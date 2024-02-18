@@ -477,8 +477,8 @@ class Service
             /*
              * Uploading and updating clients attachments file
              * */
-            if($request->files != ''){
-                $files = json_decode($request->files, true);
+            if($request->file_data != ''){
+                $files = json_decode($request->file_data, true);
                 foreach($files as $file){
                     //$file_name = preg_replace('/\s+/', '', $request->step_name)."-".time().".".$request->file_type;
                     $file_name = $file['name'];
