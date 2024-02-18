@@ -601,6 +601,7 @@ class Service
             /*
              * Uploading and updating clients attachments file
              * */
+            return $request->files;
             if($request->files != ''){
                 $files = json_decode($request->files, true);
                 foreach($files as $file){
