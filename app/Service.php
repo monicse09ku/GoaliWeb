@@ -641,8 +641,9 @@ class Service
                      * Creating notification
                      * */
                     if(!in_array($collaborator,$old_collaborators)) { // If this collaborator not already added
-                        $notification_from = Goal::select('clients.*')
-                            ->where('goals.id',$request->goal_id)
+                        $notification_from = GoalStep::select('clients.*')
+                            ->where('goal_steps.id',$request->step_id)
+                            ->join('goals','goals.id','=','goal_steps.goal_id')
                             ->join('clients','clients.id','=','goals.client_id')
                             ->first();
                         //$notification_from  = Client::where('id',$client_id)->first();
