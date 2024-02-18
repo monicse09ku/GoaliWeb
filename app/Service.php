@@ -456,7 +456,6 @@ class Service
         try{
             DB::beginTransaction();
 
-            return $request->files;
             $goal_step = NEW GoalStep();
             $goal_step->goal_id = $request->goal_id;
             $goal_step->step_name = $request->step_name;
