@@ -448,6 +448,7 @@ class ApiController extends Controller
     {
         //$files = json_decode($request->files, true);
         echo "<pre>"; print_r($request->all()); echo "</pre>";
+        echo "<pre>"; print_r($request->client_id); echo "</pre>";;
         echo "<pre>"; print_r($request->files); echo "</pre>"; exit();
         if (!Service::hasAccess($request->oAuth_token)) {
             return ['status'=>401, 'reason'=>'Invalid oAuth token'];
