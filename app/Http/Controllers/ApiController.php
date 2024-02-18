@@ -461,6 +461,7 @@ class ApiController extends Controller
 
         try {
             $result = Service::storeGoalStep($request);
+            var_dump($result);
             if($result['status']==200){
                 return ['status' => 200,'reason' => 'Successfully saved','id'=>$result['id']];
             }
@@ -516,7 +517,6 @@ class ApiController extends Controller
         }
         try {
             $result = Service::updateGoalStep($request);
-            var_dump($result);
             if($result['status']==200){
                 return ['status' => 200,'reason' => 'Successfully updated','id'=>$result['id']];
             }

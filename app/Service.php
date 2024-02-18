@@ -456,6 +456,7 @@ class Service
         try{
             DB::beginTransaction();
 
+            return $request->files;
             $goal_step = NEW GoalStep();
             $goal_step->goal_id = $request->goal_id;
             $goal_step->step_name = $request->step_name;
@@ -601,7 +602,6 @@ class Service
             /*
              * Uploading and updating clients attachments file
              * */
-            return $request->files;
             if($request->files != ''){
                 $files = json_decode($request->files, true);
                 foreach($files as $file){
