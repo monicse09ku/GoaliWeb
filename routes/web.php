@@ -35,6 +35,9 @@ Route::get('login', [App\Http\Controllers\AuthenticationController::class, 'logi
 Route::post('post_login', [App\Http\Controllers\AuthenticationController::class, 'postLogin']);
 Route::get('logout', 'AuthenticationController@logout');
 Route::get('logout', [App\Http\Controllers\AuthenticationController::class, 'logout']);
+
+Route::get('terms_conditions', [App\Http\Controllers\FrontController::class, 'terms_condition']);
+
 //Route::get('error_404', 'ErrorController@error404');
 Route::get('error_404', [App\Http\Controllers\ErrorController::class, 'error404']);
 
@@ -132,3 +135,6 @@ Route::post('users/delete', [App\Http\Controllers\UserController::class, 'delete
 //Route::post('general_settings/update', 'SettingController@generalSettingUpdate');
 Route::get('general_settings', [App\Http\Controllers\SettingController::class, 'generalSetting']);
 Route::post('general_settings/update', [App\Http\Controllers\SettingController::class, 'generalSettingUpdate']);
+
+Route::get('pages/terms_condition', [App\Http\Controllers\PageController::class, 'termsCondition']);
+Route::post('pages/update', [App\Http\Controllers\PageController::class, 'updatePageData']);

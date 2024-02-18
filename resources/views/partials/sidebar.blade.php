@@ -107,12 +107,18 @@ $page = $uri[1];
                         <span class="title">Settings</span>
                         <span class="arrow"></span>
                     </a>
-                    <ul class="sub-menu" @if($page=='general_settings' || $page=='items' || $page=='suppliers' || $page=='service_categories' || $page=='service_types' || $page=='package_uoms' || $page=='packages' || $page=='cheque_books' || $page=='parties' || $page=='party_categories' || $page=='banks' || $page=='bank_branches' || $page=='bank_accounts') style="display: block;" @endif>
-
+                    <ul class="sub-menu" @if($page=='general_settings' || $page=='terms_condition') style="display: block;" @endif>
                         <li class="nav-item @if($page=='general_settings') active @endif">
                             <a href="{{url('general_settings')}}" class="nav-link">
                                 <!--<i class="icon-users"></i>-->
                                 <span class="title">General</span>
+                                <span class="selected"></span>
+                            </a>
+                        </li>
+                        <li class="nav-item @if($page=='terms_condition') active @endif">
+                            <a href="{{url('pages/terms_condition')}}" class="nav-link">
+                                <!--<i class="icon-users"></i>-->
+                                <span class="title">Terms & Conditions</span>
                                 <span class="selected"></span>
                             </a>
                         </li>
