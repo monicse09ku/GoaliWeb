@@ -477,21 +477,25 @@ class Service
             /*
              * Uploading and updating clients attachments file
              * */
-            if($request->file != ''){
-                $file_name = preg_replace('/\s+/', '', $request->step_name)."-".time().".".$request->file_type;
-                $uri_path = "uploads/goals/" . $file_name;
-                $full_path = public_path() .'/'. $uri_path;
-                $rile = $request->file;
-                $rile = substr($rile, strpos($rile, ",")+1);
-                $data = base64_decode($rile);
-                $success = file_put_contents($full_path, $data);
-                if($success){
-                    // Updating file path to step attachment table
-                    $step_attachment = NEW GoalStepAttachment();
-                    $step_attachment->goal_step_id = $goal_step->id;
-                    $step_attachment->file_type = $request->file_type;
-                    $step_attachment->file = $uri_path;
-                    $step_attachment->save();
+            if($request->files != ''){
+                $files = json_decode($request->files, true);
+                foreach($files as $file){
+                    //$file_name = preg_replace('/\s+/', '', $request->step_name)."-".time().".".$request->file_type;
+                    $file_name = $file['name'];
+                    $uri_path = "uploads/goals/" . $file_name;
+                    $full_path = public_path() .'/'. $uri_path;
+                    $file_data = $file['data'];
+                    $file_data = substr($file_data, strpos($file_data, ",")+1);
+                    $data = base64_decode($file_data);
+                    $success = file_put_contents($full_path, $data);
+                    if($success){
+                        // Updating file path to step attachment table
+                        $step_attachment = NEW GoalStepAttachment();
+                        $step_attachment->goal_step_id = $goal_step->id;
+                        $step_attachment->file_type = $file['type'];
+                        $step_attachment->file = $uri_path;
+                        $step_attachment->save();
+                    }
                 }
             }
 
@@ -597,21 +601,25 @@ class Service
             /*
              * Uploading and updating clients attachments file
              * */
-            if($request->file != ''){
-                $file_name = preg_replace('/\s+/', '', $request->step_name)."-".time().".".$request->file_type;
-                $uri_path = "uploads/goals/" . $file_name;
-                $full_path = public_path() .'/'. $uri_path;
-                $file = $request->file;
-                $file = substr($file, strpos($file, ",")+1);
-                $data = base64_decode($file);
-                $success = file_put_contents($full_path, $data);
-                if($success){
-                    // Updating file path to step attachment table
-                    $step_attachment = NEW GoalStepAttachment();
-                    $step_attachment->goal_step_id = $goal_step->id;
-                    $step_attachment->file_type = $request->file_type;
-                    $step_attachment->file = $uri_path;
-                    $step_attachment->save();
+            if($request->files != ''){
+                $files = json_decode($request->files, true);
+                foreach($files as $file){
+                    //$file_name = preg_replace('/\s+/', '', $request->step_name)."-".time().".".$request->file_type;
+                    $file_name = $file['name'];
+                    $uri_path = "uploads/goals/" . $file_name;
+                    $full_path = public_path() .'/'. $uri_path;
+                    $file_data = $file['data'];
+                    $file_data = substr($file_data, strpos($file_data, ",")+1);
+                    $data = base64_decode($file_data);
+                    $success = file_put_contents($full_path, $data);
+                    if($success){
+                        // Updating file path to step attachment table
+                        $step_attachment = NEW GoalStepAttachment();
+                        $step_attachment->goal_step_id = $goal_step->id;
+                        $step_attachment->file_type = $file['type'];
+                        $step_attachment->file = $uri_path;
+                        $step_attachment->save();
+                    }
                 }
             }
 
