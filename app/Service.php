@@ -204,7 +204,7 @@ class Service
             $uri_path = "uploads/users/" . $file_name;
             $full_path = public_path() .'/'. $uri_path;
             $img = $request->photo;
-            $img = substr($img, strpos($img, ",")+1);
+            // $img = substr($img, strpos($img, ",")+1);
             $data = base64_decode($img);
             $success = file_put_contents($full_path, $data);
             if($success){
