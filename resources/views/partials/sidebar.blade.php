@@ -100,6 +100,14 @@ $page = $uri[1];
                     </a>
                 </li>
 
+                <li class="nav-item @if($page=='support_tickets' || $page=='view_support_tickets') active @endif" data-name="support_tickets">
+                    <a href="{{url('support_tickets')}}" class="nav-link">
+                        <i class="icon-support"></i>
+                        <span class="title">Support Tickets</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+
                 @if(Session::get('role') == 1 || Session::get('role') == 2)
                 <li class="nav-item @if($page=='general_settings' || $page=='items' || $page=='suppliers' || $page=='service_categories' || $page=='service_types' || $page=='package_uoms' || $page=='packages' || $page=='cheque_books' || $page=='parties' || $page=='party_categories' || $page=='banks' || $page=='bank_branches' || $page=='bank_accounts') open @endif">
                     <a href="javascript:;" class="nav-link nav-toggle">

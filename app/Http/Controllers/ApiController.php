@@ -1121,4 +1121,36 @@ class ApiController extends Controller
             return ['status' => 401,'reason' => $e->getMessage()];
         }
     }
+
+    /*
+     * Saving support ticket
+     * */
+    public function storeSupportTicket(Request $request)
+    {
+        if (!Service::hasAccess($request->oAuth_token)) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->name == '') {
+            return ['status'=>401, 'reason'=>'Name is required'];
+        }
+        if ($request->email == '') {
+            return ['status'=>401, 'reason'=>'Email is required'];
+        }
+        if ($request->message == '') {
+            return ['status'=>401, 'reason'=>'Message is required'];
+        }
+        try {
+            $result = Service::storeSupportTicket($request);
+            if($result['status']==200){
+                return ['status' => 200,'reason'=>$result['reason']];
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
 }

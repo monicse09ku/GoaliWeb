@@ -10,6 +10,7 @@ use App\Models\GoalStepAttachment;
 use App\Models\StepCollaborator;
 use App\Models\Notification;
 use App\Models\Network;
+use App\Models\SupportTicket;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Mail;
@@ -43,6 +44,9 @@ class Service
     }
 
     public static function hasAccess($token){
+        if($token==''){
+            return 0;
+        }
         $user = User::where('oauth_token',$token)->first();
         if(!empty($user)){
             return 1;
@@ -1306,6 +1310,25 @@ class Service
             Network::where('networks.id',$request->network_id)->delete();
 
             return ['status'=>200, 'reason'=>'Connection removed'];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
+     * Saving support ticket
+     * */
+    public static function storeSupportTicket($request){
+        try{
+            $ticket = NEW SupportTicket();
+            $ticket->sender_id = $request->client_id;
+            $ticket->name = $request->name;
+            $ticket->email = $request->email;
+            $ticket->message = $request->message;
+            $ticket->save();
+
+            return ['status'=>200, 'reason'=>'Successfully saved'];
         }
         catch(\Exception $e){
             return ['status'=>401, 'reason'=>$e->getMessage()];
