@@ -637,6 +637,35 @@ class ApiController extends Controller
     }
 
     /*
+     * Getting collaborative goal steps
+     * */
+    public function getCollaborativeStep(Request $request)
+    {
+        if (!Service::hasAccess($request->oAuth_token)) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->goal_id == '') {
+            return ['status'=>401, 'reason'=>'Goal id is required'];
+        }
+        if ($request->collaborator_id == '') {
+            return ['status'=>401, 'reason'=>'Collaborator id is required'];
+        }
+        try {
+            $result = Service::getCollaborativeStep($request);
+            if($result['status']==200){
+                return $result;
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
      * Search goal/step
      * */
     public function search(Request $request)

@@ -71,6 +71,7 @@ Route::post('service/goal_step/delete', [App\Http\Controllers\ApiController::cla
 Route::post('service/goal_step/request_mark_off', [App\Http\Controllers\ApiController::class, 'requestGoalStepMarkOff']);
 Route::post('service/goal_step/make_complete', [App\Http\Controllers\ApiController::class, 'makeCompleteGoalStep']);
 Route::post('service/goal_step/delete_attachment', [App\Http\Controllers\ApiController::class, 'deleteStepAttachment']);
+Route::post('service/goal_step/get_collaborative_steps', [App\Http\Controllers\ApiController::class, 'getCollaborativeStep']);
 
 Route::post('service/search', [App\Http\Controllers\ApiController::class, 'search']);
 Route::post('service/current_goal_search', [App\Http\Controllers\ApiController::class, 'currentGoalSearch']);

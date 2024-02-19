@@ -779,6 +779,28 @@ class Service
     }
 
     /*
+     * Getting collaborative step
+     * */
+    public static function getCollaborativeStep($request){
+        try{
+            $goal = Goal::where('id', $request->goal_id)->first();
+            $collaborative_steps = StepCollaborator::select('goal_steps.id','goal_steps.step_name','goal_steps.end_date','goal_steps.is_complete')
+                ->join('goal_steps','goal_steps.id','=','step_collaborators.step_id')
+                ->join('goals','goals.id','=','goal_steps.goal_id')
+                ->where('collaborator_id',$request->collaborator_id)
+                ->where('goals.id',$request->goal_id)
+                ->get();
+            $goal->steps = $collaborative_steps;
+
+            return ['status'=>200, 'data'=>$goal];
+        }
+        catch(\Exception $e){
+            DB::rollback();
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
      * Making goal step complete
      * */
     private static function getCompleteGoalStepPercent($goal_id){
