@@ -24,9 +24,17 @@ class SupportController extends Controller
     public function tickets(Request $request)
     {
         try{
-            $tickets = SupportTicket::where('status','active')
-                ->orderBy('id','desc')
-                ->paginate();
+            $tickets = SupportTicket::where('status','active');
+            if($request->is_read != ''){
+                if($request->is_read=='Unread'){
+                    $tickets =$tickets->where('is_read',0);
+                }
+                else if($request->is_read=='Read'){
+                    $tickets =$tickets->where('is_read',1);
+                }
+            }
+            $tickets =$tickets->orderBy('id','desc');
+            $tickets =$tickets->paginate();
             return view('support_ticket.index', compact('tickets'));
         }
         catch(\Exception $e){

@@ -42,18 +42,17 @@
                             </div>
                         </div>
                     </div>
-                    {{--<div class="portlet light ">
+                    <div class="portlet light ">
                         <div class="row">
                             <div class="col-md-8">
                                 <form id="search_form" method="get" action="">
                                     <div class="col-md-3">
                                         <div class="form-group">
-                                            <input type="text" class="form-control" name="name" id="name" placeholder="Name" value="{{request('name')}}">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <input type="text" class="form-control" name="phone" id="phone" placeholder="Phone" value="{{request('phone')}}">
+                                            <select class="form-control" name="is_read" id="is_read" >
+                                                <option value="" @if(request('is_read')=='') selected @endif>All</option>
+                                                <option value="Unread" @if(request('is_read')=='Unread') selected @endif>Unread</option>
+                                                <option value="Read" @if(request('is_read')=='Read') selected @endif>Read</option>
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="col-md-2">
@@ -67,7 +66,7 @@
                                 <a href="{{url('support_tickets')}}" class="btn btn-success">Clear Filter</a>
                             </div>
                         </div>
-                    </div>--}}
+                    </div>
                     <!-- BEGIN PROFILE SIDEBAR -->
                     <!-- <div class="profile-sidebar">
 
