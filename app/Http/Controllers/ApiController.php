@@ -556,6 +556,35 @@ class ApiController extends Controller
     }
 
     /*
+     * Requesting goal step mark off
+     * */
+    public function requestGoalStepMarkOff(Request $request)
+    {
+        if (!Service::hasAccess($request->oAuth_token)) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->step_id == '') {
+            return ['status'=>401, 'reason'=>'Step id is required'];
+        }
+        if ($request->client_id == '') {
+            return ['status'=>401, 'reason'=>'Client id is required'];
+        }
+        try {
+            $result = Service::requestGoalStepMarkOff($request);
+            if($result['status']==200){
+                return ['status' => 200,'reason' => 'Goal step mark off request successfully sent'];
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
      * Making goal step complete
      * */
     public function makeCompleteGoalStep(Request $request)
@@ -570,6 +599,32 @@ class ApiController extends Controller
             $result = Service::makeCompleteGoalStep($request);
             if($result['status']==200){
                 return ['status' => 200,'reason' => 'Goal step successfully completed'];
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
+     * Deleting goal step attachment
+     * */
+    public function deleteStepAttachment(Request $request)
+    {
+        if (!Service::hasAccess($request->oAuth_token)) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->attachment_id == '') {
+            return ['status'=>401, 'reason'=>'Attachment id is required'];
+        }
+        try {
+            $result = Service::deleteStepAttachment($request);
+            if($result['status']==200){
+                return ['status' => 200,'reason' => $result['reason']];
             }
             else{
                 return ['status' => 401,'reason' => $result['reason']];

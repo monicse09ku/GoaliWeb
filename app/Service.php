@@ -17,6 +17,7 @@ use Carbon\Carbon;
 use Session;
 use Auth;
 use DB;
+use File;
 
 /**
  * Class Service, this class is to use project common service functions
@@ -524,7 +525,7 @@ class Service
 
                     $notification = NEW Notification();
                     $notification->notification_type = 'step_collaborator_request';
-                    $notification->notification_from_id = $request->client_id;
+                    $notification->notification_from_id = $notification_from->id;
                     $notification->notification_to_id = $collaborator;
                     $notification->step_id = $goal_step->id;
                     $notification->link = '';
@@ -699,6 +700,39 @@ class Service
     }
 
     /*
+     * Requesting goal step mark off
+     * */
+    public static function requestGoalStepMarkOff($request){
+        try{
+            /*
+             * Creating notification
+             * */
+            $notification_from  = Client::where('id',$request->client_id)->first();
+            $goal  = GoalStep::select('goals.id as goal_id','goals.goal_name','goals.client_id','goal_steps.id as step_id','goal_steps.step_name')
+                ->where('goal_steps.id',$request->step_id)
+                ->join('goals','goals.id','=','goal_steps.goal_id')
+                ->first();
+            $notification_text = $notification_from->first_name.' '.$notification_from->last_name.' is requesting you to mark off the step '.$goal->step_name.' of goal '.$goal->goal_name;
+
+            $notification = NEW Notification();
+            $notification->notification_type = 'goal_step_mark_off_request';
+            $notification->notification_from_id = $request->client_id;
+            $notification->notification_to_id = $goal->client_id; // Goal creator id
+            $notification->goal_id = $goal->goal_id;
+            $notification->step_id = $request->step_id;
+            $notification->link = '';
+            $notification->text = $notification_text;
+            $notification->sent_date = date('Y-m-d h:i:s');
+            $notification->save();
+
+            return ['status'=>200, 'reason'=>'Goal step mark off request successfully sent'];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
      * Making goal step complete
      * */
     public static function makeCompleteGoalStep($request){
@@ -716,6 +750,30 @@ class Service
             return ['status'=>200, 'id'=>$goal_step->id];
         }
         catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
+     * Deleting goal step attachment
+     * */
+    public static function deleteStepAttachment($request){
+        try{
+            DB::beginTransaction();
+            $step_attachment = GoalStepAttachment::where('id',$request->attachment_id)->first();
+            GoalStepAttachment::where('id',$request->attachment_id)->delete();
+
+            // Now removing file from directory
+            //$file_data = explode('/',$step_attachment->file);
+            //$file_name = end($file_data);
+            File::delete($step_attachment->file);
+
+            DB::commit();
+
+            return ['status'=>200, 'reason'=>'Successfully deleted'];
+        }
+        catch(\Exception $e){
+            DB::rollback();
             return ['status'=>401, 'reason'=>$e->getMessage()];
         }
     }
