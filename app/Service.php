@@ -142,7 +142,7 @@ class Service
             <title>Registration Verification</title>
             </head>
             <body>
-            <p>Your registration verification code is <strong>{{$verification_code}}</strong> </p>
+            <p>Your registration verification code is <strong>".$verification_code."</strong> </p>
             <p>Use this code to verify your registration.</p>
             <p>Thanks,</p>
             <p>GOALI</p>
