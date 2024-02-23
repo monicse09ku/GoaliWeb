@@ -19,13 +19,13 @@ class Common
      * This section data need to be updated
      * based on site
      * */
-    const SITE_TITLE = 'Camelia';
-    const DOMAIN_NAME = 'camelia.com';
-    const SITE_URL = 'https://camelia.com';
+    const SITE_TITLE = 'Goali';
+    const DOMAIN_NAME = 'goali.com';
+    const SITE_URL = 'https://goali.com';
     //const SITE_URL = 'http://127.0.0.1:8000';
-    const FROM_EMAIL = 'camelia@gmail.com';
-    const FROM_NAME = 'Camelia';
-    const ADMIN_EMAIL = 'info@camelia.com';
+    const FROM_EMAIL = 'goali@gmail.com';
+    const FROM_NAME = 'Goali';
+    const ADMIN_EMAIL = 'info@goali.com';
     /*
      * Site information section ended
      * */

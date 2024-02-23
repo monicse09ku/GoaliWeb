@@ -37,7 +37,7 @@ class ApiController extends Controller
 
             if ($result) {
                 $loggedUser = Auth::user();
-                $user = User::select('users.id','users.name','users.email','users.phone','users.photo','users.role','users.oauth_token','clients.id as client_id')
+                $user = User::select('users.id','users.name','users.email','users.phone','users.photo','users.role','users.oauth_token','users.status','users.email_verified_at','clients.id as client_id')
                     ->join('clients','clients.user_id','=','users.id')
                     ->where('users.id',$loggedUser->id)
                     ->first();
@@ -237,6 +237,31 @@ class ApiController extends Controller
         }
         try {
             $result = Service::updateClientPhoto($request);
+            return $result;
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+
+    /*
+     * Verifying client and user
+     * */
+    public function verifyClient(Request $request)
+    {
+        if (!Service::hasAccess($request->oAuth_token)) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->client_id == '') {
+            return ['status'=>401, 'reason'=>'Client id is required'];
+        }
+        if ($request->verification_code == '') {
+            return ['status'=>401, 'reason'=>'Verification code is required'];
+        }
+        try {
+            $result = Service::verifyClient($request);
             return $result;
         }
         catch (\Exception $e) {

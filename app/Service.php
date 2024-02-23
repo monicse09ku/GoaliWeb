@@ -15,6 +15,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
+use App\SendMails;
 use Session;
 use Auth;
 use DB;
@@ -89,6 +90,7 @@ class Service
             }
 
             $token = Common::generaterandomString(8);
+            $verification_code = Common::generaterandomNumber(5);
 
             $client = NEW Client();
             $client->first_name = $request->first_name;
@@ -122,8 +124,21 @@ class Service
             $user->phone = $request->phone;
             $user->role = 3;
             $user->oauth_token = $token;
-            $user->status = 'active';
+            $user->verification_code = $verification_code;
+            $user->status = 'pending';
             $user->save();
+
+            /*
+             * Confirmation code sending (sms) start
+             * */
+            $emailData['email'] = $client->email;
+            $emailData['subject'] = Common::SITE_TITLE." - Registration verification code";
+            $emailData['code'] = $verification_code;
+            $view = 'emails.registration_verification';
+            $result = SendMails::sendMail($emailData, $view);
+            /*
+             * Verification code sending (sms) ends
+             * */
 
             /*
              * Update client user id
@@ -139,7 +154,7 @@ class Service
 
             Db::commit();
 
-            return ['status'=>200, 'token'=>$token, 'user'=>$user];
+            return ['status'=>200, 'reason'=>'We have sent you an email with a code, to verify your registration', 'token'=>$token, 'user'=>$user];
         }
         catch(\Exception $e){
             return ['status'=>401, 'reason'=>$e->getMessage()];
@@ -228,6 +243,35 @@ class Service
             else{
                 return ['status'=>401, 'reason'=>'Unable to save the file.'];
             }
+
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
+     * Verifying client and user
+     * */
+    public static function verifyClient($request){
+        try{
+            $user = User::select('users.*')
+                ->join('clients','clients.user_id','users.id')
+                ->where('clients.id',$request->client_id)
+                ->where('users.verification_code',$request->verification_code)
+                ->first();
+
+            if(empty($user)){
+                return ['status'=>401, 'reason'=>'Invalid verification code'];
+            }
+
+            //Updating user verification data
+            $user->email_verified_at = date('Y-m-d h:i:s');
+            $user->verification_code = '';
+            $user->status = 'active';
+            $user->save();
+
+            return ['status'=>200, 'reason'=>'Email verified successfully','user'=>$user];
 
         }
         catch(\Exception $e){

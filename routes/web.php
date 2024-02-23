@@ -52,6 +52,7 @@ Route::post('service/client/store', [App\Http\Controllers\ApiController::class, 
 Route::post('service/client/view', [App\Http\Controllers\ApiController::class, 'getClientDetails']);
 Route::post('service/client/update', [App\Http\Controllers\ApiController::class, 'updateClient']);
 Route::post('service/client/update_photo', [App\Http\Controllers\ApiController::class, 'updateClientPhoto']);
+Route::post('service/client/verify', [App\Http\Controllers\ApiController::class, 'verifyClient']);
 
 Route::post('service/genre/all', [App\Http\Controllers\ApiController::class, 'allGenre']);
 
