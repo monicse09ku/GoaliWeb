@@ -131,11 +131,30 @@ class Service
             /*
              * Confirmation code sending (sms) start
              * */
-            $emailData['email'] = $client->email;
+            /*$emailData['email'] = $client->email;
             $emailData['subject'] = Common::SITE_TITLE." - Registration verification code";
             $emailData['code'] = $verification_code;
             $view = 'emails.registration_verification';
-            $result = SendMails::sendMail($emailData, $view);
+            $result = SendMails::sendMail($emailData, $view);*/
+
+            $msg = "<html>
+            <head>
+            <title>Registration Verification</title>
+            </head>
+            <body>
+            <p>Your registration verification code is <strong>{{$verification_code}}</strong> </p>
+            <p>Use this code to verify your registration.</p>
+            <p>Thanks,</p>
+            <p>GOALI</p>
+
+            </body>
+            </html>";
+
+            $headers = "MIME-Version: 1.0" . "\r\n";
+            $headers .= "Content-type:text/html;charset=UTF-8" . "\r\b";
+            $headers .= 'From: noreply@goali.com.co' . "\r\n";
+            mail($client->email, Common::SITE_TITLE." - Registration verification code", $msg, $headers);
+
             /*
              * Verification code sending (sms) ends
              * */
