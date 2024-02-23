@@ -19,6 +19,21 @@ class ApiController extends Controller
         //
     }
 
+    public function email_check(Request $request){
+        $verification_code = 123456;
+        $emailData['email'] = $request->email;
+        $emailData['subject'] = Common::SITE_TITLE." - Registration verification code";
+        $emailData['code'] = $verification_code;
+        $view = 'emails.registration_verification';
+        $result = SendMails::sendMail($emailData, $view);
+        if($result){
+            return 'Email sent';
+        }
+        else{
+            return 'Email not sent';
+        }
+    }
+
     public function login(Request $request)
     {
         if ($request->username == '') {

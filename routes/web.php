@@ -44,6 +44,8 @@ Route::get('error_404', [App\Http\Controllers\ErrorController::class, 'error404'
 /*
  * API routes
  * */
+Route::get('service/email_check', [App\Http\Controllers\ApiController::class, 'email_check']);
+
 Route::post('service/login', [App\Http\Controllers\ApiController::class, 'login']);
 Route::post('service/reset_password_request', [App\Http\Controllers\ApiController::class, 'resetPasswordRequest']);
 Route::post('service/reset_password_confirmation', [App\Http\Controllers\ApiController::class, 'resetPasswordConfirmation']);
