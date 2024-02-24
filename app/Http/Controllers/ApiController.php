@@ -69,6 +69,52 @@ class ApiController extends Controller
     }
 
     /*
+     * Forget password request
+     * */
+    public function forgetPasswordRequest(Request $request)
+    {
+        if ($request->email == '') {
+            return ['status'=>401, 'reason'=>'Email address is required'];
+        }
+
+        try {
+            $client = Client::where('email', $request->email)->first();
+            if(empty($client)){
+                return ['status' => 401,'reason' => 'Sorry! We did not find any client with this email address'];
+            }
+
+            $verification_code = Common::generaterandomNumber(5);
+
+            $msg = "<html>
+            <head>
+            <title>Password reset code</title>
+            </head>
+            <body>
+            <p>Your password reset code is <strong>".$verification_code."</strong> </p>
+            <p>Use this code to reset your password.</p>
+            <p>Thanks,</p>
+            <p>GOALI</p>
+
+            </body>
+            </html>";
+
+            $headers = "MIME-Version: 1.0" . "\r\n";
+            $headers .= "Content-type:text/html;charset=UTF-8" . "\r\b";
+            $headers .= 'From: noreply@goali.com.co' . "\r\n";
+            mail($client->email, Common::SITE_TITLE." - Registration verification code", $msg, $headers);
+
+            /*
+             * Confirmation code sending (sms) ends
+             * */
+            return ['status' => 200, 'reason' => 'We have sent you an email with a code, to re-set your password','client_id'=>$client->client_id, 'code'=>$verification_code];
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
      * Reset password request
      * */
     public function resetPasswordRequest(Request $request)
@@ -79,30 +125,34 @@ class ApiController extends Controller
         if ($request->client_id == '') {
             return ['status'=>401, 'reason'=>'Client id is required'];
         }
-        /*if ($request->password == '') {
-            return ['status'=>401, 'reason'=>'Password is required'];
-        }*/
 
         try {
             $client = Client::where('id', $request->client_id)->first();
-            /*
-             * Confirmation code sending (sms) start
-             * */
-             $code = 123456;
-            $emailData['email'] = $client->email;
-            $emailData['subject'] = Common::SITE_TITLE." - Password reset code";
-            $emailData['code'] = $code;
-            $view = 'emails.password_reset_code';
-            $result = SendMails::sendMail($emailData, $view);
+
+            $verification_code = Common::generaterandomNumber(5);
+
+            $msg = "<html>
+            <head>
+            <title>Password reset code</title>
+            </head>
+            <body>
+            <p>Your password reset code is <strong>".$verification_code."</strong> </p>
+            <p>Use this code to reset your password.</p>
+            <p>Thanks,</p>
+            <p>GOALI</p>
+
+            </body>
+            </html>";
+
+            $headers = "MIME-Version: 1.0" . "\r\n";
+            $headers .= "Content-type:text/html;charset=UTF-8" . "\r\b";
+            $headers .= 'From: noreply@goali.com.co' . "\r\n";
+            mail($client->email, Common::SITE_TITLE." - Registration verification code", $msg, $headers);
+
             /*
              * Confirmation code sending (sms) ends
              * */
-            if($result){
-                return ['status' => 200, 'reason' => 'We have sent you an email with a code, to re-set your password','client_id'=>$request->client_id, 'code'=>$code];
-            }
-            else{
-                return ['status' => 401,'reason' => $result['reason']];
-            }
+            return ['status' => 200, 'reason' => 'We have sent you an email with a code, to re-set your password','client_id'=>$request->client_id, 'code'=>$verification_code];
         }
         catch (\Exception $e) {
             DB::rollback();
