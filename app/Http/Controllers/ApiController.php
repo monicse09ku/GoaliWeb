@@ -46,7 +46,7 @@ class ApiController extends Controller
             $result = Auth::attempt([
                 'username' => trim($request->username),
                 'password' => $request->password,
-                'status' => ['active'],
+                'status' => ['active','pending'],
                 'role' => 3,
             ]);
 
