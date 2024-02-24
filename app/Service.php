@@ -166,7 +166,7 @@ class Service
             $client_update->user_id = $user->id;
             $client_update->save();
 
-            $user = User::select('users.id','users.name','users.email','users.phone','users.photo','users.role','users.oauth_token','clients.id as client_id')
+            $user = User::select('users.id','users.name','users.email','users.phone','users.photo','users.role','users.oauth_token','users.status','clients.id as client_id')
                 ->join('clients','clients.user_id','=','users.id')
                 ->where('users.id',$user->id)
                 ->first();
