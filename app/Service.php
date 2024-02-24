@@ -182,6 +182,53 @@ class Service
     }
 
     /*
+     * Resending verification code
+     * */
+    public static function resendVerificationCode($request){
+        try{
+            $verification_code = Common::generaterandomNumber(5);
+
+            $user = User::select('users.*')
+                ->join('clients','clients.user_id','=','users.id')
+                ->where('clients.id',$request->client_id)
+                ->first();
+            $user->verification_code = $verification_code;
+            $user->save();
+
+            /*
+             * Confirmation code sending (email) start
+             * */
+
+            $msg = "<html>
+            <head>
+            <title>Registration Verification</title>
+            </head>
+            <body>
+            <p>Your registration verification code is <strong>".$verification_code."</strong> </p>
+            <p>Use this code to verify your registration.</p>
+            <p>Thanks,</p>
+            <p>GOALI</p>
+
+            </body>
+            </html>";
+
+            $headers = "MIME-Version: 1.0" . "\r\n";
+            $headers .= "Content-type:text/html;charset=UTF-8" . "\r\b";
+            $headers .= 'From: noreply@goali.com.co' . "\r\n";
+            mail($user->email, Common::SITE_TITLE." - Registration verification code", $msg, $headers);
+
+            /*
+             * Verification code sending (sms) ends
+             * */
+
+            return ['status'=>200, 'reason'=>'We have sent you an email with a code, to verify your registration'];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
      * Getting client details
      * */
     public static function getClientDetails($client_id){

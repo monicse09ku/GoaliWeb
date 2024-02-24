@@ -178,6 +178,33 @@ class ApiController extends Controller
     }
 
     /*
+     * Resending verification code
+     * */
+    public function resendVerificationCode(Request $request)
+    {
+        /*if ($request->oAuth_token != Common::OAUTH_TOKEN) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }*/
+        if ($request->client_id == '') {
+            return ['status'=>401, 'reason'=>'Client id is required'];
+        }
+
+        try {
+            $result = Service::resendVerificationCode($request);
+            if($result['status']==200){
+                return ['status' => 200,'reason' => 'Verification code successfully sent. Check your email.'];
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
      * Getting client detail data
      * */
     public function getClientDetails(Request $request)
