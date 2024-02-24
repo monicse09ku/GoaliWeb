@@ -135,13 +135,8 @@ class Service
             $user->save();
 
             /*
-             * Confirmation code sending (sms) start
+             * Confirmation code sending (email) start
              * */
-            /*$emailData['email'] = $client->email;
-            $emailData['subject'] = Common::SITE_TITLE." - Registration verification code";
-            $emailData['code'] = $verification_code;
-            $view = 'emails.registration_verification';
-            $result = SendMails::sendMail($emailData, $view);*/
 
             $msg = "<html>
             <head>
@@ -288,7 +283,7 @@ class Service
      * */
     public static function verifyClient($request){
         try{
-            $user = User::select('users.*')
+            $user = User::select('users.*','clients.id as client_id')
                 ->join('clients','clients.user_id','users.id')
                 ->where('clients.id',$request->client_id)
                 ->where('users.verification_code',$request->verification_code)
@@ -1437,6 +1432,33 @@ class Service
             $ticket->email = $request->email;
             $ticket->message = $request->message;
             $ticket->save();
+
+            /*
+             * Ticket sending (email) start
+             * */
+
+            $url = url('view_support_tickets',$ticket->id);
+            $msg = "<html>
+            <head>
+            <title>Support ticket request</title>
+            </head>
+            <body>
+            <p>You have a new ticket request from a client </p>
+            <p><a href='".$url."'>Click here to view the ticket request</a></p>
+            <p>Thanks,</p>
+            <p>GOALI</p>
+
+            </body>
+            </html>";
+
+            $headers = "MIME-Version: 1.0" . "\r\n";
+            $headers .= "Content-type:text/html;charset=UTF-8" . "\r\b";
+            $headers .= 'From: noreply@goali.com.co' . "\r\n";
+            mail('support@goali.com.co', Common::SITE_TITLE." - Support ticket request", $msg, $headers);
+
+            /*
+             * Ticket sending (email) ends
+             * */
 
             return ['status'=>200, 'reason'=>'Successfully saved'];
         }
