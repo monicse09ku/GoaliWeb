@@ -102,7 +102,7 @@ $page = $uri[1];
 
                 <li class="nav-item @if($page=='genres') active @endif" data-name="users">
                     <a href="{{url('genres')}}" class="nav-link">
-                        <i class="icon-users"></i>
+                        <i class="icon-list"></i>
                         <span class="title">Genres</span>
                         <span class="selected"></span>
                     </a>
