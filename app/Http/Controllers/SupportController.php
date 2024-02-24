@@ -50,7 +50,8 @@ class SupportController extends Controller
     public function ticketDetails(Request $request)
     {
         try{
-            $ticket = SupportTicket::where('id',$request->id)
+            $ticket = SupportTicket::with('replies')
+                ->where('id',$request->id)
                 ->first();
             $ticket->is_read = 1;
             $ticket->save();

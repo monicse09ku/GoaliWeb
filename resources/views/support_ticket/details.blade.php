@@ -46,6 +46,40 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <!-- BEGIN PORTLET -->
+                                @foreach($ticket->replies as $reply)
+                                    <div class="portlet light ">
+                                        <div class="portlet-body">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for=""><b>Name: </b></label>
+                                                        {{$ticket->name}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for=""><b>Date: </b></label>
+                                                        {{date('d/m/Y h:i a', strtotime($ticket->created_at))}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for=""><b>Email:</b></label>
+                                                        {{$ticket->email}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label for=""><b>Message</b></label>
+                                                        <div>
+                                                            {!!$ticket->message !!}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
                                 <div class="portlet light ">
                                     <div class="portlet-body">
                                         <div class="row">

@@ -89,6 +89,11 @@ class Service
                 return ['status'=>401, 'reason'=>'This client username already exists'];
             }
 
+            $old_client = User::where('email',$request->email)->where('status','!=','deleted')->first();
+            if(!empty($old_client)){
+                return ['status'=>401, 'reason'=>'This client email already exists'];
+            }
+
             $token = Common::generaterandomString(8);
             $verification_code = Common::generaterandomNumber(5);
 
