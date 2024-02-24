@@ -108,7 +108,7 @@
                                                                 <a class="btn btn-success btn-sm" href="{{url('view_support_tickets',$ticket->id)}}" title="View Details"><i class="icon-eye"></i></a>
                                                                 <a class="btn btn-danger btn-sm" href="javascript:void(0)" title="Delete" onclick="delete_ticket({{$ticket->id}})"><i class="icon-trash"></i></a>
                                                                 @if($ticket->status == 'active')
-                                                                <a class="btn btn-danger btn-sm" href="javascript:void(0)" title="Close" onclick="close_ticket({{$ticket->id}})"><i class="icon-trash"></i></a>
+                                                                <a class="btn btn-warning btn-sm" href="javascript:void(0)" title="Close" onclick="close_ticket({{$ticket->id}})"><i class="icon-close"></i></a>
                                                                 @endif
                                                             </td>
                                                         </tr>

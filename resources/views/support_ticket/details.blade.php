@@ -56,7 +56,7 @@
                                                     @if($ticket->status == 'closed')
                                                     <label for="" class="text-danger"><b>Closed ticket</b></label>
                                                     @else
-                                                        <button type="button" class="btn yellow submit-btn" id="close_button" onclick="close_ticket({{$ticket->id}})">Mark this ticket closed</button>
+                                                        <button type="button" class="btn yellow submit-btn" id="close_button" onclick="close_ticket({{$ticket->id}})"><i class="icon-close"></i>Mark this ticket closed</button>
                                                     @endif
                                                 </div>
                                             </div>
