@@ -100,6 +100,14 @@ $page = $uri[1];
                     </a>
                 </li>
 
+                <li class="nav-item @if($page=='genres') active @endif" data-name="users">
+                    <a href="{{url('genres')}}" class="nav-link">
+                        <i class="icon-users"></i>
+                        <span class="title">Genres</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+
                 <li class="nav-item @if($page=='support_tickets' || $page=='view_support_tickets') active @endif" data-name="support_tickets">
                     <a href="{{url('support_tickets')}}" class="nav-link">
                         <i class="icon-support"></i>
