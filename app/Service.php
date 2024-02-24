@@ -11,6 +11,7 @@ use App\Models\StepCollaborator;
 use App\Models\Notification;
 use App\Models\Network;
 use App\Models\SupportTicket;
+use App\Models\SupportTicketReply;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Mail;
@@ -204,7 +205,15 @@ class Service
      * */
     public static function updateClient($request){
         try{
+            if(isset($request->email)) {
+                $old_client = Client::where('email', $request->email)->where('status', '!=', 'deleted')->first();
+                if (!empty($old_client) && $old_client->id != $request->client_id) {
+                    return ['status' => 401, 'reason' => 'This client email already exists'];
+                }
+            }
+
             $client = Client::where('id',$request->client_id)->first();
+
             if(isset($request->first_name)){
                 $client->first_name = $request->first_name;
             }
@@ -1385,6 +1394,39 @@ class Service
     }
 
     /*
+     * Getting support tickets
+     * */
+    public static function getTickets($request){
+        try{
+            $tickets = SupportTicket::where('sender_id',$request->client_id)
+                ->whereIn('status',['active','closed'])
+                ->orderBy('id','desc')
+                ->get();
+
+            return ['status'=>200, 'data'=>$tickets];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
+     * Getting support ticket details
+     * */
+    public static function getTicketDetails($request){
+        try{
+            $ticket = SupportTicket::with('replies')
+                ->where('id',$request->ticket_id)
+                ->first();
+
+            return ['status'=>200, 'data'=>$ticket];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
      * Saving support ticket
      * */
     public static function storeSupportTicket($request){
@@ -1395,6 +1437,27 @@ class Service
             $ticket->email = $request->email;
             $ticket->message = $request->message;
             $ticket->save();
+
+            return ['status'=>200, 'reason'=>'Successfully saved'];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
+     * Saving support ticket reply
+     * */
+    public static function storeSupportTicketReply($request){
+        try{
+            $reply = NEW SupportTicketReply();
+            $reply->ticket_id = $request->ticket_id;
+            $reply->sender_type = 'client';
+            $reply->receiver_type = 'admin';
+            $reply->name = $request->name;
+            $reply->email = $request->email;
+            $reply->message = $request->message;
+            $reply->save();
 
             return ['status'=>200, 'reason'=>'Successfully saved'];
         }

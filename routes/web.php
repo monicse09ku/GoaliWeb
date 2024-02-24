@@ -93,7 +93,10 @@ Route::post('service/network/request_accept', [App\Http\Controllers\ApiControlle
 Route::post('service/network/request_decline', [App\Http\Controllers\ApiController::class, 'declineNetworkConnection']);
 Route::post('service/network/remove_connection', [App\Http\Controllers\ApiController::class, 'removeNetworkConnection']);
 
+Route::post('service/support/get_tickets', [App\Http\Controllers\ApiController::class, 'getTickets']);
+Route::post('service/support/view_ticket', [App\Http\Controllers\ApiController::class, 'getTicketDetails']);
 Route::post('service/support/save_ticket', [App\Http\Controllers\ApiController::class, 'storeSupportTicket']);
+Route::post('service/support/save_ticket_reply', [App\Http\Controllers\ApiController::class, 'storeSupportTicketReply']);
 
 
 Auth::routes();
@@ -149,4 +152,6 @@ Route::post('pages/update', [App\Http\Controllers\PageController::class, 'update
 
 Route::get('support_tickets', [App\Http\Controllers\SupportController::class, 'tickets']);
 Route::get('view_support_tickets/{id}', [App\Http\Controllers\SupportController::class, 'ticketDetails']);
+Route::post('support_tickets/send_reply', [App\Http\Controllers\SupportController::class, 'storeTicketReply']);
+Route::post('support_tickets/close', [App\Http\Controllers\SupportController::class, 'closeTicket']);
 Route::post('support_tickets/delete', [App\Http\Controllers\SupportController::class, 'deleteTicket']);

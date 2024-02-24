@@ -1163,6 +1163,58 @@ class ApiController extends Controller
     }
 
     /*
+     * Getting support tickets
+     * */
+    public function getTickets(Request $request)
+    {
+        if (!Service::hasAccess($request->oAuth_token)) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->client_id == '') {
+            return ['status'=>401, 'reason'=>'Client id is required'];
+        }
+        try {
+            $result = Service::getTickets($request);
+            if($result['status']==200){
+                return $result;
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
+     * Getting support ticket details
+     * */
+    public function getTicketDetails(Request $request)
+    {
+        if (!Service::hasAccess($request->oAuth_token)) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->ticket_id == '') {
+            return ['status'=>401, 'reason'=>'Ticket id is required'];
+        }
+        try {
+            $result = Service::getTicketDetails($request);
+            if($result['status']==200){
+                return $result;
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
      * Saving support ticket
      * */
     public function storeSupportTicket(Request $request)
@@ -1181,6 +1233,41 @@ class ApiController extends Controller
         }
         try {
             $result = Service::storeSupportTicket($request);
+            if($result['status']==200){
+                return ['status' => 200,'reason'=>$result['reason']];
+            }
+            else{
+                return ['status' => 401,'reason' => $result['reason']];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
+     * Saving support ticket reply
+     * */
+    public function storeSupportTicketReply(Request $request)
+    {
+        if (!Service::hasAccess($request->oAuth_token)) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->ticket_id == '') {
+            return ['status'=>401, 'reason'=>'Ticket id is required'];
+        }
+        if ($request->name == '') {
+            return ['status'=>401, 'reason'=>'Name is required'];
+        }
+        if ($request->email == '') {
+            return ['status'=>401, 'reason'=>'Email is required'];
+        }
+        if ($request->message == '') {
+            return ['status'=>401, 'reason'=>'Message is required'];
+        }
+        try {
+            $result = Service::storeSupportTicketReply($request);
             if($result['status']==200){
                 return ['status' => 200,'reason'=>$result['reason']];
             }

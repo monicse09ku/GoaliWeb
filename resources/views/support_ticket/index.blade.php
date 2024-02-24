@@ -107,6 +107,9 @@
                                                             <td class="text-center">
                                                                 <a class="btn btn-success btn-sm" href="{{url('view_support_tickets',$ticket->id)}}" title="View Details"><i class="icon-eye"></i></a>
                                                                 <a class="btn btn-danger btn-sm" href="javascript:void(0)" title="Delete" onclick="delete_ticket({{$ticket->id}})"><i class="icon-trash"></i></a>
+                                                                @if($ticket->status == 'active')
+                                                                <a class="btn btn-danger btn-sm" href="javascript:void(0)" title="Close" onclick="close_ticket({{$ticket->id}})"><i class="icon-trash"></i></a>
+                                                                @endif
                                                             </td>
                                                         </tr>
                                                     @endforeach
@@ -151,6 +154,34 @@
                         hide_loader();
                         if (data.status == 200) {
                             $('#ticket_'+id).remove();
+                            location.reload();
+                        } else {
+                            show_error_message(data.reason);
+                        }
+                    },
+                    error: function(data) {
+                        hide_loader();
+                        show_error_message(data);
+                    }
+                });
+            });
+        }
+
+        function close_ticket(id){
+            $(".warning_message").text('Are you sure you want to close this ticket? This can not be undone.');
+            $("#warning_modal").modal('show');
+            $( "#warning_ok" ).on('click',function() {
+                show_loader();
+                var url = "{{ url('support_tickets/close') }}";
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: {ticket_id:id,'_token':'{{csrf_token()}}'},
+                    success: function(data) {
+                        hide_loader();
+                        if (data.status == 200) {
+                            $('#ticket_'+id).remove();
+                            location.reload();
                         } else {
                             show_error_message(data.reason);
                         }

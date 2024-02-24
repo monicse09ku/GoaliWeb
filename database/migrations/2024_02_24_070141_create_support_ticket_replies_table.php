@@ -20,6 +20,8 @@ class CreateSupportTicketRepliesTable extends Migration
             $table->enum('receiver_type', ['admin','client'])->default('client');
             $table->integer('sender_id')->nullable();
             $table->integer('receiver_id')->nullable();
+            $table->string('name')->nullable();
+            $table->string('email')->nullable();
             $table->text('message')->nullable();
             $table->tinyInteger('is_read')->default(0)->nullable();
             $table->enum('status', ['active','inactive','deleted'])->default('active');

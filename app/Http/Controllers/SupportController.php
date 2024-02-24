@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\SupportTicket;
+use App\Models\SupportTicketReply;
 use App\Common;
 use Auth;
 use Session;
@@ -24,7 +25,7 @@ class SupportController extends Controller
     public function tickets(Request $request)
     {
         try{
-            $tickets = SupportTicket::where('status','active');
+            $tickets = SupportTicket::whereIn('status',['active','closed']);
             if($request->is_read != ''){
                 if($request->is_read=='Unread'){
                     $tickets =$tickets->where('is_read',0);
@@ -68,6 +69,50 @@ class SupportController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
+    public function storeTicketReply(Request $request)
+    {
+        try{
+            $reply = NEW SupportTicketReply();
+            $reply->ticket_id = $request->ticket_id;
+            $reply->sender_type = 'admin';
+            $reply->receiver_type = 'client';
+            $reply->name = $request->name;
+            $reply->message = $request->message;
+            $reply->created_at = date('Y-m-d h:i:s');
+            $reply->save();
+
+            return ['status'=>200, 'reason'=>'Successfully sent'];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>'Something went wrong. Try again later'];
+        }
+    }
+
+    /**
+     * Close ticket details
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function closeTicket(Request $request)
+    {
+        try{
+            $ticket = SupportTicket::where('id',$request->ticket_id)->first();
+            $ticket->status = 'closed';
+            $ticket->closed_at = date('Y-m-d h:i:s');
+            $ticket->save();
+
+            return ['status'=>200, 'reason'=>'Successfully closed'];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>'Something went wrong. Try again later'];
+        }
+    }
+
+    /**
+     * Delete ticket details
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
     public function deleteTicket(Request $request)
     {
         try{
@@ -79,7 +124,7 @@ class SupportController extends Controller
             return ['status'=>200, 'reason'=>'Successfully deleted'];
         }
         catch(\Exception $e){
-            return redirect('error_404');
+            return ['status'=>401, 'reason'=>'Something went wrong. Try again later'];
         }
     }
 }
