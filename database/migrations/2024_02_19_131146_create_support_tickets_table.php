@@ -21,7 +21,7 @@ class CreateSupportTicketsTable extends Migration
             $table->text('subject')->nullable();
             $table->text('message')->nullable();
             $table->tinyInteger('is_read')->default(0)->nullable();
-            $table->enum('status', ['active','inactive','deleted'])->default('active');
+            $table->enum('status', ['active','inactive','closed','deleted'])->default('active');
             $table->timestamps();
             $table->timestamp('deleted_at')->nullable();
         });
