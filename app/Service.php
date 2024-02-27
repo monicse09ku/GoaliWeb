@@ -1477,6 +1477,7 @@ class Service
             $ticket->sender_id = $request->client_id;
             $ticket->name = $request->name;
             $ticket->email = $request->email;
+            $ticket->subject = $request->subject;
             $ticket->message = $request->message;
             $ticket->save();
 
