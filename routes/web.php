@@ -47,6 +47,7 @@ Route::get('error_404', [App\Http\Controllers\ErrorController::class, 'error404'
 Route::get('service/email_check', [App\Http\Controllers\ApiController::class, 'email_check']);
 
 Route::post('service/login', [App\Http\Controllers\ApiController::class, 'login']);
+Route::post('service/other_login', [App\Http\Controllers\ApiController::class, 'otherLogin']);
 Route::post('service/forget_password_request', [App\Http\Controllers\ApiController::class, 'forgetPasswordRequest']);
 Route::post('service/reset_password_request', [App\Http\Controllers\ApiController::class, 'resetPasswordRequest']);
 Route::post('service/reset_password_confirmation', [App\Http\Controllers\ApiController::class, 'resetPasswordConfirmation']);
@@ -57,6 +58,8 @@ Route::post('service/client/update', [App\Http\Controllers\ApiController::class,
 Route::post('service/client/update_photo', [App\Http\Controllers\ApiController::class, 'updateClientPhoto']);
 Route::post('service/client/resend_verification_code', [App\Http\Controllers\ApiController::class, 'resendVerificationCode']);
 Route::post('service/client/verify', [App\Http\Controllers\ApiController::class, 'verifyClient']);
+Route::post('service/client/change_type', [App\Http\Controllers\ApiController::class, 'updateClientType']);
+Route::post('service/client/change_notification_setting', [App\Http\Controllers\ApiController::class, 'updateClientNotificationSetting']);
 
 Route::post('service/genre/all', [App\Http\Controllers\ApiController::class, 'allGenre']);
 

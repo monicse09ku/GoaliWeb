@@ -281,6 +281,40 @@ class Service
         }
     }
 
+    /*
+     * Updating client type
+     * */
+    public static function updateClientType($request){
+        try{
+            $client = Client::where('id',$request->client_id)->first();
+            $client->account_type = $request->account_type;
+            $client->updated_at = date('Y-m-d h:i:s');
+            $client->save();
+
+            return ['status'=>200, 'reason'=>'Updated successfully'];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
+    /*
+     * Updating client notification settings
+     * */
+    public static function updateClientNotificationSetting($request){
+        try{
+            $client = Client::where('id',$request->client_id)->first();
+            $client->allow_notification = $request->allow_notification;
+            $client->updated_at = date('Y-m-d h:i:s');
+            $client->save();
+
+            return ['status'=>200, 'reason'=>'Updated successfully'];
+        }
+        catch(\Exception $e){
+            return ['status'=>401, 'reason'=>$e->getMessage()];
+        }
+    }
+
 
     /*
      * Saving client photo
@@ -1009,6 +1043,7 @@ class Service
                 if($request->email != ''){
                     $clients = $clients->where('email', $request->email);
                 }
+                $clients = $clients->where('account_type', 'public');
                 $clients = $clients->where('id','!=', $request->client_id); // Ignoring self search
                 $clients = $clients->get();
 
@@ -1028,11 +1063,15 @@ class Service
                 return ['status'=>200, 'clients'=>$clients];
             }
             else if($request->search_category=='skill'){ // If search category is skill
-                $clients = Client::select('id','first_name','last_name','core_skills','photo')
-                    ->where('first_name', 'like', '%' . $request->text . '%')
-                    ->orWhere('last_name', 'like', '%' . $request->text . '%')
-                    ->orWhere('core_skills', 'like', '%' . $request->text . '%')
-                    ->get();
+                $text = $request->text;
+                $clients = Client::select('id','first_name','last_name','core_skills','photo');
+                $clients = $clients->where('account_type', 'public');
+                $clients = $clients->where(function($query) use ($text){
+                        $query->orwhere('first_name', 'like', '%' . $text . '%');
+                        $query->orwhere('last_name', 'like', '%' . $text . '%');
+                        $query->orwhere('core_skills', 'like', '%' . $text . '%');
+                    });
+                $clients = $clients->get();
 
                 return ['status'=>200, 'clients'=>$clients];
             }

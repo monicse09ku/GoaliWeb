@@ -69,6 +69,84 @@ class ApiController extends Controller
     }
 
     /*
+     * LOgin with google, facebook, apple etc.
+     * */
+    public function otherLogin(Request $request)
+    {
+        if ($request->email == '') {
+            return ['status'=>401, 'reason'=>'Email is required'];
+        }
+        if ($request->account_from == '') {
+            return ['status'=>401, 'reason'=>'Account from is required'];
+        }
+        try {
+            $user = User::select('users.id','users.name','users.email','users.phone','users.photo','users.role','users.oauth_token','users.status','users.email_verified_at','clients.id as client_id')
+                ->join('clients','clients.user_id','=','users.id')
+                ->where('users.email',$request->email)
+                ->where('users.role',3)
+                ->whereIn('users.status',['active','pending'])
+                ->first();
+
+            if (!empty($user)) {
+                return ['status' => 200, 'reason' => 'Successfully Authenticated','user'=>$user,'role_id'=>$user->role];
+            }
+            else {
+                DB::beginTransaction();
+
+                $old_client = User::where('email',$request->email)->where('status','!=','deleted')->first();
+                if(!empty($old_client)){
+                    return ['status'=>401, 'reason'=>'This client email already exists'];
+                }
+
+                $token = Common::generaterandomString(8);
+
+                $client = NEW Client();
+                $client->first_name = $request->name;
+                //$client->last_name = $request->last_name;
+                $client->email = $request->email;
+                $client->account_from = $request->account_from;
+                $client->created_at = date('Y-m-d h:i:s');
+                $client->save();
+
+                /*
+                 * Adding user information
+                 * */
+                $user = new User();
+                $user->name = $request->name;
+                $user->email = $request->email;
+                $user->username = $request->email;
+                $user->password = bcrypt($request->email);
+                $user->phone = $request->phone;
+                $user->role = 3;
+                $user->oauth_token = $token;
+                $user->email_verified_at = date('Y-m-d h:i:s');
+                $user->status = 'pending';
+                $user->save();
+
+                /*
+                 * Update client user id
+                 * */
+                $client_update = Client::where('id',$client->id)->first();
+                $client_update->user_id = $user->id;
+                $client_update->save();
+
+                $user = User::select('users.id','users.name','users.email','users.phone','users.photo','users.role','users.oauth_token','users.status','clients.id as client_id')
+                    ->join('clients','clients.user_id','=','users.id')
+                    ->where('users.id',$user->id)
+                    ->first();
+
+                DB::commit();
+
+                return ['status' => 200, 'reason' => 'Successfully Authenticated','user'=>$user,'role_id'=>$user->role];
+            }
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
      * Forget password request
      * */
     public function forgetPasswordRequest(Request $request)
@@ -354,6 +432,54 @@ class ApiController extends Controller
         }
         try {
             $result = Service::verifyClient($request);
+            return $result;
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
+     * Update client type
+     * */
+    public function updateClientType(Request $request)
+    {
+        if (!Service::hasAccess($request->oAuth_token)) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->client_id == '') {
+            return ['status'=>401, 'reason'=>'Client id is required'];
+        }
+        if ($request->account_type == '') {
+            return ['status'=>401, 'reason'=>'Account type is required'];
+        }
+        try {
+            $result = Service::updateClientType($request);
+            return $result;
+        }
+        catch (\Exception $e) {
+            DB::rollback();
+            return ['status' => 401,'reason' => $e->getMessage()];
+        }
+    }
+
+    /*
+     * Update client notification settings
+     * */
+    public function updateClientNotificationSetting(Request $request)
+    {
+        if (!Service::hasAccess($request->oAuth_token)) {
+            return ['status'=>401, 'reason'=>'Invalid oAuth token'];
+        }
+        if ($request->client_id == '') {
+            return ['status'=>401, 'reason'=>'Client id is required'];
+        }
+        if ($request->allow_notification == '') {
+            return ['status'=>401, 'reason'=>'Allow notification is required'];
+        }
+        try {
+            $result = Service::updateClientNotificationSetting($request);
             return $result;
         }
         catch (\Exception $e) {
