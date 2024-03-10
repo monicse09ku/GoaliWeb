@@ -1099,41 +1099,45 @@ class Service
      * */
     public static function addCollaborators($request){
         try{
+            $goals = explode(',',$request->goal_id);
             $collaborators = explode(',',$request->collaborators);
-            foreach($collaborators as $collaborator){
-                /*
-                 * Check if collaborators already added
-                 * */
-                $ext_collaborator = GoalCollaborator::where('goal_id',$request->goal_id)
-                    ->where('collaborator_id',$collaborator)
-                    ->where('status','!=','deleted')
-                    ->first();
-
-                if(empty($ext_collaborator)){
-                    $goal_collaborator = NEW GoalCollaborator();
-                    $goal_collaborator->goal_id = $request->goal_id;
-                    $goal_collaborator->collaborator_id = $collaborator;
-                    $goal_collaborator->created_at = date('Y-m-d h:i:s');
-                    $goal_collaborator->save();
-
+            foreach($goals as $goal_id){
+                foreach($collaborators as $collaborator){
                     /*
-                     * Creating notification
+                     * Check if collaborators already added
                      * */
-                    $notification_from  = Client::where('id',$request->client_id)->first();
-                    $goal  = Goal::where('id',$request->goal_id)->first();
-                    $notification_text = $notification_from->first_name.' '.$notification_from->last_name.' is inviting you to collaborate on '.$goal->goal_name;
+                    $ext_collaborator = GoalCollaborator::where('goal_id',$goal_id)
+                        ->where('collaborator_id',$collaborator)
+                        ->where('status','!=','deleted')
+                        ->first();
 
-                    $notification = NEW Notification();
-                    $notification->notification_type = 'collaborator_request';
-                    $notification->notification_from_id = $request->client_id;
-                    $notification->notification_to_id = $collaborator;
-                    $notification->goal_id = $request->goal_id;
-                    $notification->link = '';
-                    $notification->text = $notification_text;
-                    $notification->sent_date = date('Y-m-d h:i:s');
-                    $notification->save();
+                    if(empty($ext_collaborator)){
+                        $goal_collaborator = NEW GoalCollaborator();
+                        $goal_collaborator->goal_id = $goal_id;
+                        $goal_collaborator->collaborator_id = $collaborator;
+                        $goal_collaborator->created_at = date('Y-m-d h:i:s');
+                        $goal_collaborator->save();
+
+                        /*
+                         * Creating notification
+                         * */
+                        $notification_from  = Client::where('id',$request->client_id)->first();
+                        $goal  = Goal::where('id',$goal_id)->first();
+                        $notification_text = $notification_from->first_name.' '.$notification_from->last_name.' is inviting you to collaborate on '.$goal->goal_name;
+
+                        $notification = NEW Notification();
+                        $notification->notification_type = 'collaborator_request';
+                        $notification->notification_from_id = $request->client_id;
+                        $notification->notification_to_id = $collaborator;
+                        $notification->goal_id = $goal_id;
+                        $notification->link = '';
+                        $notification->text = $notification_text;
+                        $notification->sent_date = date('Y-m-d h:i:s');
+                        $notification->save();
+                    }
                 }
             }
+
             return ['status'=>200, 'reason'=>'Collaborators added successfully'];
         }
         catch(\Exception $e){

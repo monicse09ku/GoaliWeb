@@ -165,9 +165,9 @@ class ApiController extends Controller
      * */
     public function resetPasswordConfirmation(Request $request)
     {
-        if ($request->oAuth_token != Common::OAUTH_TOKEN) {
+        /*if ($request->oAuth_token != Common::OAUTH_TOKEN) {
             return ['status'=>401, 'reason'=>'Invalid oAuth token'];
-        }
+        }*/
         if ($request->client_id == '') {
             return ['status'=>401, 'reason'=>'Client id is required'];
         }
