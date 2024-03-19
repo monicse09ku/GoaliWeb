@@ -52,7 +52,7 @@ class ApiController extends Controller
 
             if ($result) {
                 $loggedUser = Auth::user();
-                $user = User::select('users.id','users.name','users.email','users.phone','users.photo','users.role','users.oauth_token','users.status','users.email_verified_at','clients.id as client_id')
+                $user = User::select('users.id','users.name','users.email','users.phone','users.photo','users.role','users.oauth_token','users.status','users.email_verified_at','clients.id as client_id','clients.account_type','clients.allow_notification')
                     ->join('clients','clients.user_id','=','users.id')
                     ->where('users.id',$loggedUser->id)
                     ->first();

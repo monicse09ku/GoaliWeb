@@ -167,7 +167,7 @@ class Service
             $client_update->user_id = $user->id;
             $client_update->save();
 
-            $user = User::select('users.id','users.name','users.email','users.phone','users.photo','users.role','users.oauth_token','users.status','clients.id as client_id')
+            $user = User::select('users.id','users.name','users.email','users.phone','users.photo','users.role','users.oauth_token','users.status','clients.id as client_id','clients.account_type','clients.allow_notification')
                 ->join('clients','clients.user_id','=','users.id')
                 ->where('users.id',$user->id)
                 ->first();
@@ -291,7 +291,12 @@ class Service
             $client->updated_at = date('Y-m-d h:i:s');
             $client->save();
 
-            return ['status'=>200, 'reason'=>'Updated successfully'];
+            $user = User::select('users.id','users.name','users.email','users.phone','users.photo','users.role','users.oauth_token','users.status','clients.id as client_id','clients.account_type','clients.allow_notification')
+                ->join('clients','clients.user_id','=','users.id')
+                ->where('users.id',$client->user_id)
+                ->first();
+
+            return ['status'=>200, 'reason'=>'Updated successfully', 'user' => $user];
         }
         catch(\Exception $e){
             return ['status'=>401, 'reason'=>$e->getMessage()];
@@ -308,7 +313,12 @@ class Service
             $client->updated_at = date('Y-m-d h:i:s');
             $client->save();
 
-            return ['status'=>200, 'reason'=>'Updated successfully'];
+            $user = User::select('users.id','users.name','users.email','users.phone','users.photo','users.role','users.oauth_token','users.status','clients.id as client_id','clients.account_type','clients.allow_notification')
+                ->join('clients','clients.user_id','=','users.id')
+                ->where('users.id',$client->user_id)
+                ->first();
+
+            return ['status'=>200, 'reason'=>'Updated successfully', 'user' => $user];
         }
         catch(\Exception $e){
             return ['status'=>401, 'reason'=>$e->getMessage()];
