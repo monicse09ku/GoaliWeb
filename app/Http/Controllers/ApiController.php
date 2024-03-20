@@ -184,7 +184,7 @@ class ApiController extends Controller
             /*
              * Confirmation code sending (sms) ends
              * */
-            return ['status' => 200, 'reason' => 'We have sent you an email with a code, to re-set your password','client_id'=>$client->client_id, 'code'=>$verification_code];
+            return ['status' => 200, 'reason' => 'We have sent you an email with a code, to re-set your password','client_id'=>$client->id, 'code'=>$verification_code];
         }
         catch (\Exception $e) {
             DB::rollback();
