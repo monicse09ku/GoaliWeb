@@ -1358,13 +1358,13 @@ class Service
      * */
     public static function getMyNetworkConnection($request){
         try{
-            $networks_to = Network::select('networks.id','clients.id as connected_with_id',DB::raw("CONCAT(clients.first_name,' ',clients.last_name) as connected_with_name"),'networks.status','users.phone','users.email','users.photo')
+            $networks_to = Network::select('networks.id','clients.id as connected_with_id',DB::raw("CONCAT(clients.first_name,' ',clients.last_name) as connected_with_name"),'networks.status','users.phone','users.email','users.photo', 'clients.core_skills')
                 ->leftJoin('clients','clients.id','=','networks.connected_with_id')
                 ->leftJoin('users','users.id','=','clients.user_id')
                 ->where('networks.client_id',$request->client_id)
                 ->get()->toArray();
 
-            $networks_from = Network::select('networks.id','clients.id as connected_with_id',DB::raw("CONCAT(clients.first_name,' ',clients.last_name) as connected_with_name"),'networks.status','users.phone','users.email','users.photo')
+            $networks_from = Network::select('networks.id','clients.id as connected_with_id',DB::raw("CONCAT(clients.first_name,' ',clients.last_name) as connected_with_name"),'networks.status','users.phone','users.email','users.photo', 'clients.core_skills')
                 ->leftJoin('clients','clients.id','=','networks.client_id')
                 ->leftJoin('users','users.id','=','clients.user_id')
                 ->where('networks.connected_with_id',$request->client_id)
